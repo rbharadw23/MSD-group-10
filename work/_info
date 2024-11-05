@@ -1,0 +1,46 @@
+m255
+K4
+z2
+!s99 nomlopt
+!s11f vlog 2021.3_1 2021.08, Aug 15 2021
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+d/u/moulya/Verilog WKSP/A2
+T_opt
+!s110 1730834041
+V8N[Tn6jPeiP8WebE^=LZI2
+04 12 4 work trace_reader fast 0
+=1-525400b63b2a-672a6e78-b67ea-c49
+!s124 OEM100
+o-quiet -auto_acc_if_foreign -work work
+Z0 tCvgOpt 0
+n@_opt
+OL;O;2021.3_1;73
+vtrace_reader
+DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+!s110 1730833993
+!i10b 1
+!s100 iW=g0X2EV?D1V:f2WF04Q2
+IQf17:RI@RVAJQdk@_JSfT0
+S1
+d/u/moulya/MSD/MSD
+w1730833766
+8/u/moulya/MSD/MSD/Trace_reader.sv
+F/u/moulya/MSD/MSD/Trace_reader.sv
+!i122 0
+L0 2 65
+VDg1SIo80bB@j0V0VzS_@n1
+OL;L;2021.3_1;73
+r1
+!s85 0
+31
+!s108 1730833993.000000
+!s107 /u/moulya/MSD/MSD/Trace_reader.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/Trace_reader.sv|
+!i113 0
+o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R0

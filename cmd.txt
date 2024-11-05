@@ -1,0 +1,4 @@
+//passing file through cmds
+vsim -c -do "run -all" work.trace_reader +input_file=rwims.din +define+DEBUG
+//Default file
+vsim -c -do "run -all" work.trace_reader
