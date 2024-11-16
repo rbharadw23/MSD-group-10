@@ -38,23 +38,24 @@ module trace_reader;
                 // Attempt to parse the line into fields
                 // Assuming the first part is a decimal number and the second is a hex number
                 status = $sscanf(line, "%d %h", field1, field2); //$sscanf returns the number of successful conversions.
-`ifndef DEBUG
 
-                if (status == 2) begin
-                    // Successfully parsed the line
-                    $display("Parsed: field1=%0d, field2=%h", field1, field2);
 
           
                 end
-`else
-		$display("Error parsed line: %s", line);
- 
-                /*else begin
-                    $display("Error parsing line: %s", line);
-                end*/
+
+
+
+`ifdef DEBUG
+		$display("Parsed: field1=%0d, field2=%h", field1, field2);
+ //silent execution - will get info in debug mode 
+
   `endif
             
             end
+
+                if (status == 2) begin
+                    // Successfully parsed the line
+                    $display("Sucessfully parsed");
 
         end
 
