@@ -9,7 +9,7 @@ z2
 !i10e 25
 !i10f 100
 cModel Technology
-d/u/moulya/Verilog WKSP/A2
+Z0 d/u/moulya/Verilog WKSP/A2
 T_opt
 !s110 1730834041
 V8N[Tn6jPeiP8WebE^=LZI2
@@ -17,11 +17,89 @@ V8N[Tn6jPeiP8WebE^=LZI2
 =1-525400b63b2a-672a6e78-b67ea-c49
 !s124 OEM100
 o-quiet -auto_acc_if_foreign -work work
-Z0 tCvgOpt 0
+Z1 tCvgOpt 0
 n@_opt
 OL;O;2021.3_1;73
+R0
+vcache
+Z2 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z3 DXx4 work 15 parameters_defn 0 22 ^VU]agP1jkS`dPKOWINYJ3
+DXx4 work 20 cache_design_sv_unit 0 22 h2@8DV>;R7U3N2`izk1XS3
+Z4 !s110 1731969746
+Z5 VDg1SIo80bB@j0V0VzS_@n1
+r1
+!s85 0
+!i10b 1
+!s100 zX3nXnl?YCC?WbPAaEQYo0
+IMG_`DMaK>UCMmYFWJYAJ01
+!s105 cache_design_sv_unit
+S1
+Z6 d/u/moulya/MSD/MSD/cp2_push
+Z7 w1731965361
+Z8 8/u/moulya/MSD/MSD/cp2_push/cache_design.sv
+Z9 F/u/moulya/MSD/MSD/cp2_push/cache_design.sv
+!i122 2
+Z10 L0 2 65
+Z11 OL;L;2021.3_1;73
+31
+Z12 !s108 1731969746.000000
+Z13 !s107 /u/moulya/MSD/MSD/cp2_push/cache_design.sv|
+Z14 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/cp2_push/cache_design.sv|
+!i113 0
+Z15 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R1
+Xcache_design_sv_unit
+R2
+R3
+R4
+Vh2@8DV>;R7U3N2`izk1XS3
+r1
+!s85 0
+!i10b 1
+!s100 G37C0Nzn<2CG<l2=zoj]72
+Ih2@8DV>;R7U3N2`izk1XS3
+!i103 1
+S1
+R6
+R7
+R8
+R9
+!i122 2
+Z16 L0 1 0
+R11
+31
+R12
+R13
+R14
+!i113 0
+R15
+R1
+Xparameters_defn
+R2
+!s110 1731969747
+!i10b 1
+!s100 @0d;RBh@Az^a4l^<eMkVA0
+I^VU]agP1jkS`dPKOWINYJ3
+S1
+R6
+w1731965402
+8/u/moulya/MSD/MSD/cp2_push/cache_parameter.sv
+F/u/moulya/MSD/MSD/cp2_push/cache_parameter.sv
+!i122 3
+R16
+V^VU]agP1jkS`dPKOWINYJ3
+R11
+r1
+!s85 0
+31
+R12
+!s107 /u/moulya/MSD/MSD/cp2_push/cache_parameter.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/cp2_push/cache_parameter.sv|
+!i113 0
+R15
+R1
 vtrace_reader
-DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+R2
 !s110 1730833993
 !i10b 1
 !s100 iW=g0X2EV?D1V:f2WF04Q2
@@ -32,9 +110,9 @@ w1730833766
 8/u/moulya/MSD/MSD/Trace_reader.sv
 F/u/moulya/MSD/MSD/Trace_reader.sv
 !i122 0
-L0 2 65
-VDg1SIo80bB@j0V0VzS_@n1
-OL;L;2021.3_1;73
+R10
+R5
+R11
 r1
 !s85 0
 31
@@ -42,5 +120,5 @@ r1
 !s107 /u/moulya/MSD/MSD/Trace_reader.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/Trace_reader.sv|
 !i113 0
-o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-R0
+R15
+R1
