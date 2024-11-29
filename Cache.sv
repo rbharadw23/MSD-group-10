@@ -25,7 +25,7 @@ typedef cache_block_t cache_set_t [SET_ASSOCIATIVITY-1:0];  // in 1 set we have 
     // Signals for reading input file
     string default_file = "rwims.din";
     //string input_filename = "input.txt";
-    integer input_file;
+    string input_file;
     bit [31:0] address;
     bit [1:0] opcode;
     //string operation; //rbharadw
@@ -35,10 +35,8 @@ typedef cache_block_t cache_set_t [SET_ASSOCIATIVITY-1:0];  // in 1 set we have 
 
     // Initialize cache: Set all blocks as invalid
     initial begin
-        foreach (cache[i]) begin
-            foreach (cache[i].[j]) begin
-                cache[i].[j].valid = 0;
-            end
+        foreach (cache[index,i]) begin
+                cache[index][i].valid = 0; 
         end
     end
 
@@ -95,12 +93,25 @@ typedef cache_block_t cache_set_t [SET_ASSOCIATIVITY-1:0];  // in 1 set we have 
 
         // Check for hit in the set
         hit = 0;
-        foreach (cache[index].[i]) begin
-            if (cache[index].[i].valid && (cache[index].[i].tag == tag)) begin
+        /*foreach (cache[index]) 
+begin
+        foreach (cache[i]) begin
+            if (cache[index][i].valid && (cache[index][i].tag == tag)) begin
                 hit = 1;  // Cache hit
                 break;
             end
+          end
         end
+*/
+
+foreach (cache[index,i]) 
+begin
+
+            if (cache[index][i].valid && (cache[index][i].tag == tag)) begin
+                hit = 1;  // Cache hit
+                break;
+            end
+          end
 
         if (hit) begin
             $display("Cache HIT for %s address 0x%h", opcode ? "STORE" : "LOAD", address);
@@ -108,10 +119,11 @@ typedef cache_block_t cache_set_t [SET_ASSOCIATIVITY-1:0];  // in 1 set we have 
             $display("Cache MISS for %s address 0x%h", opcode ? "STORE" : "LOAD", address);
             // On miss: Insert into the cache (could evict if needed, but simple version doesn't handle eviction)
             // For simplicity, assume we replace the first invalid block
-            foreach (cache[index].[i]) begin
-                if (!cache[index].[i].valid) begin
-                    cache[index].[i].valid = 1;
-                    cache[index].[i].tag = tag;
+            foreach (cache[index,i]) begin
+                          
+                if (!cache[index][i].valid) begin
+                    cache[index][i].valid = 1;
+                    cache[index][i].tag = tag;
                     break;
                 end
             end
