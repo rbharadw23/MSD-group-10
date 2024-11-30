@@ -17,28 +17,24 @@ module cache_simulator();
 // Use parameters from the cache_config_pkg package
 import cache_config_pkg::*; 
 
-typedef cache_block_t cache_set_t [SET_ASSOCIATIVITY-1:0];  // in 1 set we have 16 cache_block , each cache block consists dirty,valid,tag_bits
-//typedef cache_block_t [SET_ASSOCIATIVITY-1:0]blocks ;  // in 1 set we have 16 cache_block , each cache block consists dirty,valid,tag_bits
-
     cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache sets
 
-    // Signals for reading input file
-    string default_file = "rwims.din";
-    //string input_filename = "input.txt";
-    string input_file;
+    string default_file = "rwims.din"; // Signals for reading input file
+    string input_file; //string input_filename = "input.txt";
     bit [31:0] address;
     bit [1:0] opcode;
-    //string operation; //rbharadw
     integer status;
     string line;
     integer file;
 
-    // Initialize cache: Set all blocks as invalid
-    initial begin
-        foreach (cache[index,i]) begin
-                cache[index][i].valid = 0; 
+// Initialize cache: Set all blocks as invalid
+initial begin
+    foreach (cache[index]) begin
+        foreach (cache[index].CACHE_INDEX[i]) begin
+            cache[index].CACHE_INDEX[i].valid = 0;
         end
     end
+end
 
    initial begin
         // Check if the user provided a file name via $value$plusargs
@@ -91,44 +87,37 @@ typedef cache_block_t cache_set_t [SET_ASSOCIATIVITY-1:0];  // in 1 set we have 
         // Extract tag, index, and block offset
         get_cache_parts(address, tag, index, block_offset);
 
-        // Check for hit in the set
-        hit = 0;
-        /*foreach (cache[index]) 
-begin
-        foreach (cache[i]) begin
-            if (cache[index][i].valid && (cache[index][i].tag == tag)) begin
-                hit = 1;  // Cache hit
-                break;
-            end
-          end
+
+// Check for hit in the set
+hit = 0; 
+
+foreach (cache[index]) begin
+    foreach (cache[index].CACHE_INDEX[i]) begin
+        if (cache[index].CACHE_INDEX[i].valid && (cache[index].CACHE_INDEX[i].tag == tag)) begin
+            hit = 1;  // Cache hit
+            break;
         end
-*/
+    end
+end
 
-foreach (cache[index,i]) 
-begin
-
-            if (cache[index][i].valid && (cache[index][i].tag == tag)) begin
-                hit = 1;  // Cache hit
-                break;
-            end
-          end
-
-        if (hit) begin
+if (hit) begin
             $display("Cache HIT for %s address 0x%h", opcode ? "STORE" : "LOAD", address);
-        end else begin
+end
+ 
+else begin
             $display("Cache MISS for %s address 0x%h", opcode ? "STORE" : "LOAD", address);
-            // On miss: Insert into the cache (could evict if needed, but simple version doesn't handle eviction)
-            // For simplicity, assume we replace the first invalid block
-            foreach (cache[index,i]) begin
-                          
-                if (!cache[index][i].valid) begin
-                    cache[index][i].valid = 1;
-                    cache[index][i].tag = tag;
-                    break;
-                end
+
+foreach (cache[index]) begin
+    foreach (cache[index].CACHE_INDEX[i]) begin
+        if (!cache[index].CACHE_INDEX[i].valid) begin
+            cache[index].CACHE_INDEX[i].valid = 1;  // Mark the block as valid
+            cache[index].CACHE_INDEX[i].tag = tag; // Assign the tag
+            break;
             end
         end
-    endtask
+    end
+end
+endtask
 
 
 endmodule

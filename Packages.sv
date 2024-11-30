@@ -16,4 +16,9 @@ package cache_config_pkg;
         logic [1:0] MESI_BITS;
     } cache_block_t;
 
+ typedef struct { 
+logic [14:0] PLRU;
+cache_block_t CACHE_INDEX [SET_ASSOCIATIVITY-1:0];
+} cache_set_t;  //15PLRU bits per each set
+
 endpackage : cache_config_pkg
