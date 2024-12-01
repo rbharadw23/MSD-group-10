@@ -55,14 +55,24 @@ end
 
         // Process each line in the file
         while (!$feof(file)) begin
-            $fscanf(file, "%b %h\n", opcode, address);
+            //rbharadw $fscanf(file, "%b %h\n", opcode, address);
+            line = "";
+         if ($fgets(line, file)) begin
+         $sscanf(line, "%d %h", opcode, address);
             if (opcode ==0) begin
-                cache_access(address, 0);  // Load operation
-            end else if (opcode == "1") begin
-                cache_access(address, 1);  // Store operation
-            end else begin
+                cache_access(address, 0);  // read request from L1 data cache (LOAD L1)
+            end 
+            else if (opcode ==1) begin
+                cache_access(address, 1);  // write request from L1 data cache (STORE L1)
+            end
+            else if (opcode ==2) begin
+                cache_access(address, 2);  // read request from L1 instruction cache (LOAD INSTR L1)
+            end 
+ 
+            else begin
                 $display("Unknown opcode: %s", opcode);
             end
+         end
         end
         $fclose(file);
     end
