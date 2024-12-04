@@ -146,11 +146,13 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
 					cache[index].CACHE_INDEX[i].MESI_BITS = S;
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
+                                        message =SENDLINE;
+                                        cache[index].CACHE_INDEX[i].MESI_BITS = S; 
 				end
        end  
     endtask
 
-    task automatic snoop_wr_req_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_wr_req_hit(input [13:0] index_bits, input [11:0] tag_bits);//TA
       begin
     integer i;
     bit index=index_bits;
@@ -160,7 +162,7 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
       end  
     endtask
 
-    task automatic snoop_rd_rwim_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_rd_rwim_hit(input [13:0] index_bits, input [11:0] tag_bits);//busrdx
      begin
     integer i;
     bit index=index_bits;
@@ -180,7 +182,7 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
       end  
     endtask
 
-    task automatic snoop_invalidate_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_invalidate_hit(input [13:0] index_bits, input [11:0] tag_bits);//busupgr
      begin
     integer i;
     bit index=index_bits;
