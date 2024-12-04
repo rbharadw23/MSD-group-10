@@ -1,12 +1,13 @@
 `include "Packages.sv"  // Include the cache parameters package
 
-module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output message,output busOp,output Snoopresult);
+module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output message);
     // Use parameters from the cache_config_pkg package
     import cache_config_pkg::*; 
 
     cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache sets
     bit [31:0] address=address_ip;
     bit [1:0] opcode=op_ip;
+    Snoopresult result;
      
     // Extract cache address parts
     task automatic get_cache_parts(
@@ -19,12 +20,6 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
         index = address[BLOCK_OFFSET_BITS + INDEX_BITS-1:BLOCK_OFFSET_BITS];  // Next 14 bits
         tag = address[31:BLOCK_OFFSET_BITS + INDEX_BITS];  // Remaining bits
     endtask
-
-    // Cache access task with integrated state handling
-   /* task automatic cache_access(
-        input [31:0] address, 
-        input logic opcode
-    );*/
 
       task automatic cache_access();
         logic [TAG_BITS-1:0] tag;
@@ -88,13 +83,16 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit [3:0] selected_victim = victim_cache(local_PLRU);
     
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S)begin
-					message = SENDLINE;
+					MessageToCache(SENDLINE,address);
+                                        result=BusOperation(opcode,address,result);
 				end
 			    else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
-					message = SENDLINE; 
+					MessageToCache(SENDLINE,address);
+                                        result=BusOperation(opcode,address,result);                            
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
-				    message = SENDLINE;
+				    MessageToCache(SENDLINE,address);
+                                        result=BusOperation(opcode,address,result);
 				end
        end    
     endtask
@@ -105,14 +103,17 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
                 if (cache[index].CACHE_INDEX[i].MESI_BITS == S)begin
 					busOp = INVALIDATE;
-					message = GETLINE;
+					MessageToCache(GETLINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = M;
+                                        result=BusOperation(opcode,address,result);
 				end
 			    else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
+                                        result=BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
-				    message = GETLINE;
+				    MessageToCache(GETLINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = M;
+                                        result=BusOperation(opcode,address,result);
 				end
         end 
      endtask
@@ -122,13 +123,16 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     integer i;
     bit index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S)begin
-					message = SENDLINE;
+					MessageToCache(SENDLINE,address);
+                                        result=BusOperation(opcode,address,result);
 				end
 			    else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
-					message = SENDLINE; 
+					MessageToCache(SENDLINE,address); 
+                                        result=BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
-				    message = SENDLINE;
+				    MessageToCache(SENDLINE,address);
+                                        result=BusOperation(opcode,address,result);
 				end
        end
     endtask
@@ -138,16 +142,19 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     integer i;
     bit index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S) begin
-					message = SENDLINE;
+					MessageToCache(SENDLINE,address);
+                                        result=BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
 					busOp = WRITE;
 					message =GETLINE;
 					cache[index].CACHE_INDEX[i].MESI_BITS = S;
+                                        result=BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
                                         message =SENDLINE;
                                         cache[index].CACHE_INDEX[i].MESI_BITS = S; 
+                                        result=BusOperation(opcode,address,result);
 				end
        end  
     endtask
@@ -157,7 +164,8 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     integer i;
     bit index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-					message = SENDLINE;
+					MessageToCache(SENDLINE,address);
+                                        result=BusOperation(opcode,address,result);
 				end			
       end  
     endtask
@@ -168,16 +176,19 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S) begin
-					message = INVALIDATELINE;
+					MessageToCache(INVALIDATELINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = I;
+                                        result=BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
 					busOp = WRITE;
 					message =INVALIDATELINE;
 					cache[index].CACHE_INDEX[i].MESI_BITS = I;
+                                        result=BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
-					message = INVALIDATELINE;
+					MessageToCache(INVALIDATELINE,address);
+                                        result=BusOperation(opcode,address,result);
                                 end
       end  
     endtask
@@ -188,8 +199,9 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
 
             if (cache[index].CACHE_INDEX[i].MESI_BITS == S) begin
-					message = INVALIDATELINE;
+					MessageToCache(INVALIDATELINE,address);
 				cache[index].CACHE_INDEX[i].MESI_BITS = I;
+                                        result=BusOperation(opcode,address,result);
 			end
        end   
     endtask
@@ -202,15 +214,17 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
 					busOp = READ;
-				    message = SENDLINE;
+				    MessageToCache(SENDLINE,address);
 					//get snoop result
-					cache[index].CACHE_INDEX[i].MESI_BITS = S;					
+					cache[index].CACHE_INDEX[i].MESI_BITS = S;
+                                        result=BusOperation(opcode,address,result);					
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
 					busOp = READ;
-				    message = SENDLINE;
+				    MessageToCache(SENDLINE,address);
 					//get snoop result
 					cache[index].CACHE_INDEX[i].MESI_BITS = E;
+                                        result=BusOperation(opcode,address,result);
 				end
       end 
     endtask
@@ -222,8 +236,9 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
 					busOp =RWIM;
-					message = GETLINE;
+					MessageToCache(GETLINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = M;
+                                        result=BusOperation(opcode,address,result);
 				end	
       end 
     endtask
@@ -234,15 +249,17 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
 					busOp = READ;
-				    message = SENDLINE;
+				    MessageToCache(SENDLINE,address);
 					//get snoop result
-					cache[index].CACHE_INDEX[i].MESI_BITS = S;					
+					cache[index].CACHE_INDEX[i].MESI_BITS = S;
+                                        result=BusOperation(opcode,address,result);					
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
 					busOp = READ;
-				    message = SENDLINE;
+				    MessageToCache(SENDLINE,address);
 					//get snoop result
 					cache[index].CACHE_INDEX[i].MESI_BITS = E;
+                                        result=BusOperation(opcode,address,result);
 				end
      end    
     endtask
@@ -253,7 +270,7 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-				    Snoopresult = NOHIT;
+                                        result=BusOperation(opcode,address,result);
 				end
      end
     
@@ -265,6 +282,7 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
+                                        result=BusOperation(opcode,address,result);
 				end
         end
     endtask
@@ -275,6 +293,7 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
+                                        result=BusOperation(opcode,address,result);
 				end
       end  
     endtask
@@ -285,6 +304,7 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     bit index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
+                                        result=BusOperation(opcode,address,result);
 				end
       end 
     endtask
@@ -330,5 +350,30 @@ function automatic bit [3:0] victim_cache(ref bit[14:0]PLRU);
     return victim;
   endfunction
 
+function automatic Snoopresult GetSnoopResult_funct(input bit [31:0] address);
+    if (address[1:0] == 2'b00)
+        return HIT;
+    else if (address[1:0] == 2'b01)
+        return HITM;
+    else
+        return NOHIT;
+endfunction
+
+task automatic BusOperation(
+    input busOp BusOp, 
+    input bit [31:0] Address, 
+    output Snoopresult SnoopResult
+);
+    SnoopResult = GetSnoopResult_funct(Address);
+    
+    //if (NormalMode) begin
+        $display("BusOp: %0d, Address: %0h, Snoop Result: %0d",BusOp, Address, SnoopResult);
+    //end
+endtask
+
+function void MessageToCache(bit Message, bit [31:0]Address);
+//if (NormalMode)
+$display("L2: %d %h\n", Message, Address);
+endfunction
 
 endmodule
