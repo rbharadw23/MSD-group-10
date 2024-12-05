@@ -5,6 +5,9 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache sets
     bit [31:0] address=address_ip;
     bit [1:0] opcode=op_ip;
+    logic [TAG_BITS-1:0] tag;
+    logic [INDEX_BITS-1:0] index;
+    logic [BLOCK_OFFSET_BITS-1:0] block_offset;
     //Snoopresult result;
      
     // Extract cache address parts
@@ -20,9 +23,9 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     endtask
 
       task automatic cache_access();
-        logic [TAG_BITS-1:0] tag;
+        /*logic [TAG_BITS-1:0] tag;
         logic [INDEX_BITS-1:0] index;
-        logic [BLOCK_OFFSET_BITS-1:0] block_offset;
+        logic [BLOCK_OFFSET_BITS-1:0] block_offset;*/
         logic hit;
         integer i;
 
@@ -73,236 +76,237 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
     endtask
 
     // Hit scenario tasks
-    task automatic rd_req_from_l1_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    //task automatic rd_req_from_l1_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic rd_req_from_l1_hit(input [13:0] index, input [11:0] tag);
     begin
     integer i;
-    bit [13:0]index=index_bits;
-    bit [14:0] local_PLRU = cache[index].plru_tree; // Accessing PLRU from the cache set
-    bit [3:0] selected_victim = victim_cache(local_PLRU);
+    //bit [13:0]index=index_bits;
+    //bit [14:0] local_PLRU = cache[index].plru_tree; // Accessing PLRU from the cache set
+    //bit [3:0] selected_victim = victim_cache(local_PLRU);
     
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S)begin
-					message_op=MessageToCache(SENDLINE,address); // if needed like this
-                                        result=BusOperation(opcode,address,result); 
+					MessageToCache(SENDLINE,address); // if needed like this
+                                        BusOperation(opcode,address,result); 
 				end
 			    else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
 					MessageToCache(SENDLINE,address);
-                                        result=BusOperation(opcode,address,result);                            
+                                        BusOperation(opcode,address,result);                            
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
 				    MessageToCache(SENDLINE,address);
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
        end    
     endtask
 
-    task automatic wr_req_from_l1_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic wr_req_from_l1_hit(input [13:0] index, input [11:0] tag);
        begin
      integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
                 if (cache[index].CACHE_INDEX[i].MESI_BITS == S)begin
-					busOp = INVALIDATE;
+					//busOp = INVALIDATE;
 					MessageToCache(GETLINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = M;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 			    else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
 				    MessageToCache(GETLINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = M;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
         end 
      endtask
 
-    task automatic rd_req_instr_from_l1_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic rd_req_instr_from_l1_hit(input [13:0] index, input [11:0] tag);
        begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S)begin
 					MessageToCache(SENDLINE,address);
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 			    else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
 					MessageToCache(SENDLINE,address); 
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
 				    MessageToCache(SENDLINE,address);
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
        end
     endtask
 
-    task automatic snoop_rd_req_hit(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_rd_req_hit(input [13:0] index, input [11:0] tag);
       begin
     integer i;
-    bit [13:0]index=index_bits;
+   // bit [13:0]index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S) begin
 					MessageToCache(SENDLINE,address);
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
-					busOp = WRITE;
+					//busOp = WRITE;
 					MessageToCache(GETLINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = S;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
                                         MessageToCache(SENDLINE,address);
                                         cache[index].CACHE_INDEX[i].MESI_BITS = S; 
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
        end  
     endtask
 
-    task automatic snoop_wr_req_hit(input [13:0] index_bits, input [11:0] tag_bits);//TA
+    task automatic snoop_wr_req_hit(input [13:0] index, input [11:0] tag);//TA
       begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
 					MessageToCache(SENDLINE,address);
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end			
       end  
     endtask
 
-    task automatic snoop_rd_rwim_hit(input [13:0] index_bits, input [11:0] tag_bits);//busrdx
+    task automatic snoop_rd_rwim_hit(input [13:0] index, input [11:0] tag);//busrdx
      begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == S) begin
 					MessageToCache(INVALIDATELINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = I;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == M)begin
-					busOp = WRITE;
+					//busOp = WRITE;
 					MessageToCache(INVALIDATELINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = I;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == E)begin
 					MessageToCache(INVALIDATELINE,address);
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
                                 end
       end  
     endtask
 
-    task automatic snoop_invalidate_hit(input [13:0] index_bits, input [11:0] tag_bits);//busupgr
+    task automatic snoop_invalidate_hit(input [13:0] index, input [11:0] tag);//busupgr
      begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 
             if (cache[index].CACHE_INDEX[i].MESI_BITS == S) begin
 					MessageToCache(INVALIDATELINE,address);
 				cache[index].CACHE_INDEX[i].MESI_BITS = I;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 			end
        end   
     endtask
 
     // Miss scenario tasks
-    task automatic rd_req_from_l1_miss(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic rd_req_from_l1_miss(input [13:0] index, input [11:0] tag);
        begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-					busOp = READ;
+					//busOp = READ;
 				    MessageToCache(SENDLINE,address);
 					//get snoop result
 					cache[index].CACHE_INDEX[i].MESI_BITS = S;
-                                        result=BusOperation(opcode,address,result);					
+                                        BusOperation(opcode,address,result);					
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-					busOp = READ;
+					//busOp = READ;
 				    MessageToCache(SENDLINE,address);
 					//get snoop result
 					cache[index].CACHE_INDEX[i].MESI_BITS = E;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
       end 
     endtask
 
-    task automatic wr_req_from_l1_miss(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic wr_req_from_l1_miss(input [13:0] index, input [11:0] tag);
        begin
     integer i;
-    bit [13:0]index=index_bits;
+   // bit [13:0]index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-					busOp =RWIM;
+					//busOp =RWIM;
 					MessageToCache(GETLINE,address);
 					cache[index].CACHE_INDEX[i].MESI_BITS = M;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end	
       end 
     endtask
 
-    task automatic rd_req_instr_miss(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic rd_req_instr_miss(input [13:0] index, input [11:0] tag);
     begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-					busOp = READ;
+					//busOp = READ;
 				    MessageToCache(SENDLINE,address);
 					//get snoop result
 					cache[index].CACHE_INDEX[i].MESI_BITS = S;
-                                        result=BusOperation(opcode,address,result);					
+                                        BusOperation(opcode,address,result);					
 				end
 				else if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-					busOp = READ;
+					//busOp = READ;
 				    MessageToCache(SENDLINE,address);
 					//get snoop result
 					cache[index].CACHE_INDEX[i].MESI_BITS = E;
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
      end    
     endtask
 
-    task automatic snoop_rd_req_miss(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_rd_req_miss(input [13:0] index, input [11:0] tag);
     begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
      end
     
     endtask
 
-    task automatic snoop_wr_req_miss(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_wr_req_miss(input [13:0] index, input [11:0] tag);
        begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
         end
     endtask
 
-    task automatic snoop_rd_rwim_miss(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_rd_rwim_miss(input [13:0] index, input [11:0] tag);
       begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
       end  
     endtask
 
-    task automatic snoop_invalidate_miss(input [13:0] index_bits, input [11:0] tag_bits);
+    task automatic snoop_invalidate_miss(input [13:0] index, input [11:0] tag);
       begin
     integer i;
-    bit [13:0]index=index_bits;
+    //bit [13:0]index=index_bits;
 
 				if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-                                        result=BusOperation(opcode,address,result);
+                                        BusOperation(opcode,address,result);
 				end
       end 
     endtask
@@ -316,13 +320,13 @@ function automatic bit [3:0] access_cache(ref bit[14:0]PLRU);
        begin
         PLRU[index] = 0;
         access[i]=0;
-        index = 2 * index + 1;        
+        index = (2 * index) + 1;        
        end 
       else ////access way is right
        begin
         PLRU[index] = 1; 
         access[i]=1;
-        index = 2 * index + 2;        
+        index = (2 * index) + 2;        
        end
     end
     return access;
@@ -357,13 +361,13 @@ function automatic Snoopresult GetSnoopResult_funct(input bit [31:0] address);
         return NOHIT;
 endfunction
 
-task automatic BusOperation( input busOp BusOp, input bit [31:0] Address,output Snoopresult SnoopResult);
+function void BusOperation( input bit BusOp, input bit [31:0] Address,output Snoopresult SnoopResult);
     SnoopResult = GetSnoopResult_funct(Address);
     
     //if (NormalMode) begin
         $display("BusOp: %0d, Address: %0h, Snoop Result: %0d",BusOp, Address, SnoopResult);
     //end
-endtask
+endfunction
 
 function void MessageToCache(bit Message, bit [31:0]Address);
 //if (NormalMode)
