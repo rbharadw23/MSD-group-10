@@ -9,14 +9,14 @@ package cache_config_pkg;
     parameter int INDEX_BITS = 14;  // log2(NUM_SETS) -> 16384 sets = 2^14 = 14 bits
     parameter int TAG_BITS = 12;  // ADDR 32 BITS - (BLOCK_OFFSET_BITS + INDEX_BITS) = 12 bits
 
-typedef enum logic [2:0] {M,E,S,I} mesistate;
+typedef enum logic [1:0] {M,E,S,I} mesistate;
 typedef enum { READ, WRITE, INVALIDATE, RWIM } busOp;
 typedef enum { NOHIT, HIT, HITM } Snoopresult;
 typedef enum { GETLINE, SENDLINE, INVALIDATELINE, EVICTLINE } message;
 
    typedef struct {
-        logic valid;
-        logic dirty;
+        //logic valid;
+        //logic dirty;
         logic [TAG_BITS-1:0] tag;  // Tag field
          mesistate [1:0] MESI_BITS;
     } cache_block_t;

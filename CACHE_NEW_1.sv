@@ -36,7 +36,7 @@ module cache_simulator(input bit [31:0] address_ip,input bit [1:0] op_ip,output 
         hit = 0; 
 
         foreach (cache[index].CACHE_INDEX[i]) begin
-            if (cache[index].CACHE_INDEX[i].valid && (cache[index].CACHE_INDEX[i].tag == tag)) begin
+            if (cache[index].CACHE_INDEX[i].MESI_BITS != I && (cache[index].CACHE_INDEX[i].tag == tag)) begin
                 hit = 1;  // Cache hit
                 break;
             end
