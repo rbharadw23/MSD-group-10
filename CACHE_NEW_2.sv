@@ -13,7 +13,7 @@ module cache_simulator;
 
      //Cache simulator variables
     cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache set
-    logic [1:0] opcode;
+    integer opcode;
     logic [31:0] address;
     logic [TAG_BITS-1:0] tag;
     logic [INDEX_BITS-1:0] index;
@@ -27,6 +27,7 @@ module cache_simulator;
     integer hit_count;
     integer hit_ratio;
     int plru_index=0; //PLRU index
+    Snoopresult result;
  
     initial begin
    
@@ -82,6 +83,136 @@ if (hit) begin
              hit_count=hit_count+1;
 
 //add mesi hit conditions
+
+case(opcode)
+
+0://rd req from l1 hit
+begin
+
+
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
+					MessageToCache(SENDLINE);
+                                        updatePLRU(); 
+                                        BusOperation(READ); 
+				end
+			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+					MessageToCache(SENDLINE);
+                                        updatePLRU();
+                                        BusOperation(READ);                            
+				end
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+				    MessageToCache(SENDLINE);
+                                     updatePLRU();
+                                    BusOperation(READ);
+				end
+                                        read_count = read_count+1;
+end
+
+1://wr req from l1 hit       
+begin
+                if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
+					//busOp = INVALIDATE;
+					MessageToCache(GETLINE);
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end
+			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+				    MessageToCache(GETLINE);
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end
+                                      write_count = write_count+1;
+end 
+
+2://rd req instr from l1 hit
+begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
+					MessageToCache(SENDLINE);
+                                        BusOperation(READ);
+                                        updatePLRU();
+				end
+			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+					MessageToCache(SENDLINE);
+                                        updatePLRU(); 
+                                        BusOperation(READ);
+				end
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+				    MessageToCache(SENDLINE);
+                                        updatePLRU();
+                                    BusOperation(READ);
+				end
+                                        read_count = read_count+1;
+end
+
+3://snoop rd req hit
+begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
+					MessageToCache(SENDLINE);
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+					//busOp = WRITE;
+					MessageToCache(GETLINE);
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+                                        MessageToCache(SENDLINE);
+                                        cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
+                                        updatePLRU(); 
+                                        BusOperation(READ);
+				end
+end
+
+4://snoop wr req hit
+begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == I) begin
+					MessageToCache(SENDLINE);
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end			
+end
+
+5://snoop rd rwim hit
+begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
+					MessageToCache(INVALIDATELINE);
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+					//busOp = WRITE;
+					MessageToCache(INVALIDATELINE);
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
+                                        updatePLRU();
+                                        BusOperation(READ);
+				end
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+					MessageToCache(INVALIDATELINE);
+                                        updatePLRU();
+                                        BusOperation(READ);
+                                end
+end 
+
+6://snoop invalidate hit
+begin
+            if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
+					MessageToCache(INVALIDATELINE);
+				        cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
+                                        updatePLRU();
+                                        BusOperation(READ);
+			end
+end
+endcase
 end
 
 else begin
@@ -97,9 +228,100 @@ foreach (cache[index].CACHE_INDEX[i]) begin
         end
 end
 
-//add mesi miss conditions
+
+
+case(opcode)
+0://rd req from l1 miss
+begin
+GetSnoopResult_funct();
+
+if(result==NOHIT) begin
+				    MessageToCache(SENDLINE);	
+				    cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
+                                    updatePLRU();
+                                    BusOperation(READ);
+                                    read_count = read_count+1; 
+             end
+
+
+else begin
+					MessageToCache(SENDLINE);
+			                cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
+                                        updatePLRU();
+                                        BusOperation(READ);
+                                        read_count = read_count+1; 					
+
+             end
 end
 
+1://wr req from l1 miss
+begin
+				
+					//busOp =RWIM;
+					MessageToCache(GETLINE);
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
+                                        updatePLRU();
+                                        BusOperation(READ);
+                                        write_count = write_count+1;
+                                        //BusOperation(opcode,address,result);
+			
+end 
+
+2://rd req instr miss
+begin
+GetSnoopResult_funct();
+
+if(result==NOHIT) begin
+				    MessageToCache(SENDLINE);	
+				    cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
+                                    updatePLRU();
+                                    BusOperation(READ);
+                                    read_count = read_count+1; 
+             end
+
+
+else begin
+					MessageToCache(SENDLINE);
+			                cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
+                                        updatePLRU();
+                                        BusOperation(READ);
+                                        read_count = read_count+1; 					
+
+             end
+
+end
+
+3://snoop rd req miss
+begin
+				MessageToCache(SENDLINE);	
+                                    updatePLRU();
+                                    BusOperation(READ);	
+end
+
+4://snoop wr req miss
+begin
+		               	MessageToCache(SENDLINE);
+                                    updatePLRU();
+                                    BusOperation(READ);
+end
+
+5://snoop rd rwim miss
+begin
+			            MessageToCache(SENDLINE);
+                                    updatePLRU();
+                                    BusOperation(READ); 
+end  
+
+
+6://snoop invalidate miss
+begin
+					MessageToCache(SENDLINE);
+                                        updatePLRU();
+                                        BusOperation(READ);
+end
+
+endcase
+end
 
 
 end
@@ -164,6 +386,25 @@ function bit [3:0] victim_way();
     return victim;
   endfunction
 
+function Snoopresult GetSnoopResult_funct();
+    if (address[1:0] == 2'b00)
+        result = HIT;
+    else if (address[1:0] == 2'b01)
+        result = HITM;
+    else
+        result = NOHIT;
+endfunction
+
+function void BusOperation(busOp BusOP);
+`ifdef NORMAL
+ $display("BusOp: %0d, Address: %0h, Snoop Result: %0d",BusOP,address,result); 
+`endif
+endfunction
+
+function void MessageToCache(message Message);
+`ifdef NORMAL
+$display("L2: %d %h\n", Message, Address);
+`endif
+endfunction
 
 endmodule
-
