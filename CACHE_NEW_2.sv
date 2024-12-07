@@ -13,19 +13,19 @@ module cache_simulator;
 
      //Cache simulator variables
     cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache set
-    integer opcode;
-    logic [31:0] address;
-    logic [TAG_BITS-1:0] tag;
-    logic [INDEX_BITS-1:0] index;
-    logic [BLOCK_OFFSET_BITS-1:0] block_offset;
+    integer opcode='b0;
+    logic [31:0] address='b0;
+    logic [TAG_BITS-1:0] tag='b0;
+    logic [INDEX_BITS-1:0] index='b0;
+    logic [BLOCK_OFFSET_BITS-1:0] block_offset='b0;
     bit [3:0] way_map[15:0];
     bit [3:0] block_line;
-    integer read_count;
-    integer write_count;
-    integer miss_count;
-    integer hit;
-    integer hit_count;
-    integer hit_ratio;
+    integer read_count='b0;
+    integer write_count='b0;
+    integer miss_count='b0;
+    integer hit='b0;
+    integer hit_count='b0;
+    integer hit_ratio='b0;
     int plru_index=0; //PLRU index
     Snoopresult result;
  
@@ -49,12 +49,20 @@ module cache_simulator;
               if ($fgets(line, file)) begin
                 status = $sscanf(line, "%d %h", opcode, address); //$sscanf returns the number of successful conversions
                 cache_function();
+                //$display("addr %h ,op %d",address,opcode);
                 end
             end
 
                 if (status == 2) begin // Successfully parsed the line
                     $display("Sucessfully parsed");
                 end
+
+hit_ratio=hit_count/(hit_count+miss_count);
+$display("Cache hit ratio = %0d",hit_ratio);
+$display("Number of cache reads= %0d",read_count);
+$display("Number of cache writes = %0d",write_count);
+$display("Number of cache hits %0d",hit_count);
+$display("Number of cache misss %0d",miss_count);
 
         $fclose(file);
         $display("Finished reading the file.");
@@ -82,9 +90,15 @@ end
 if (hit) begin 
              hit_count=hit_count+1;
 
+
 //add mesi hit conditions
 
 case(opcode)
+
+8://reset
+begin
+reset();
+end
 
 0://rd req from l1 hit
 begin
@@ -93,17 +107,17 @@ begin
 				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
 					MessageToCache(SENDLINE);
                                         updatePLRU(); 
-                                        BusOperation(READ); 
+                                         
 				end
 			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
 					MessageToCache(SENDLINE);
                                         updatePLRU();
-                                        BusOperation(READ);                            
+                                                                    
 				end
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
 				    MessageToCache(SENDLINE);
                                      updatePLRU();
-                                    BusOperation(READ);
+                                    
 				end
                                         read_count = read_count+1;
 end
@@ -111,21 +125,21 @@ end
 1://wr req from l1 hit       
 begin
                 if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
-					//busOp = INVALIDATE;
+					
 					MessageToCache(GETLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
                                         updatePLRU();
-                                        BusOperation(READ);
+                                        BusOperation(INVALIDATE);
 				end
 			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
-                                        updatePLRU();
-                                        BusOperation(READ);
+                                        updatePLRU(); 
 				end
+
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
 				    MessageToCache(GETLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
                                         updatePLRU();
-                                        BusOperation(READ);
+                                        
 				end
                                       write_count = write_count+1;
 end 
@@ -133,19 +147,18 @@ end
 2://rd req instr from l1 hit
 begin
 				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
-					MessageToCache(SENDLINE);
-                                        BusOperation(READ);
+					MessageToCache(SENDLINE); 
                                         updatePLRU();
 				end
 			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
 					MessageToCache(SENDLINE);
                                         updatePLRU(); 
-                                        BusOperation(READ);
+                                        
 				end
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
 				    MessageToCache(SENDLINE);
                                         updatePLRU();
-                                    BusOperation(READ);
+                                    
 				end
                                         read_count = read_count+1;
 end
@@ -153,53 +166,53 @@ end
 3://snoop rd req hit
 begin
 				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
-					MessageToCache(SENDLINE);
-                                        updatePLRU();
-                                        BusOperation(READ);
+					 
+                                        result=HIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result ); 
 				end
+
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
-					//busOp = WRITE;
+					
 					MessageToCache(GETLINE);
-					cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
-                                        updatePLRU();
-                                        BusOperation(READ);
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = S; 
+                                        BusOperation(WRITE);
+                                    result=HITM; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );
 				end
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
-                                        MessageToCache(SENDLINE);
+                                        
                                         cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
-                                        updatePLRU(); 
-                                        BusOperation(READ);
+                                        result=HIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );
+                                        
 				end
 end
 
-4://snoop wr req hit
-begin
-				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == I) begin
-					MessageToCache(SENDLINE);
-                                        updatePLRU();
-                                        BusOperation(READ);
-				end			
-end
 
 5://snoop rd rwim hit
 begin
 				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
-					MessageToCache(INVALIDATELINE);
+					
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
-                                        updatePLRU();
-                                        BusOperation(READ);
+                                   result=HIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );
+                                       
 				end
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
-					//busOp = WRITE;
-					MessageToCache(INVALIDATELINE);
-					cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
-                                        updatePLRU();
-                                        BusOperation(READ);
+					
+					MessageToCache(GETLINE);	
+					cache[index].CACHE_INDEX[block_line].MESI_BITS = I; 
+                                        BusOperation(WRITE);
+                                        MessageToCache(INVALIDATELINE);
+                                   result=HITM; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );
 				end
+
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
-					MessageToCache(INVALIDATELINE);
-                                        updatePLRU();
-                                        BusOperation(READ);
+
+                                        cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
+                                   result=HIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );
                                 end
 end 
 
@@ -208,8 +221,8 @@ begin
             if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
 					MessageToCache(INVALIDATELINE);
 				        cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
-                                        updatePLRU();
-                                        BusOperation(READ);
+                                   result=HIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );
 			end
 end
 endcase
@@ -217,6 +230,7 @@ end
 
 else begin
          miss_count=miss_count+1;
+
 foreach (cache[index].CACHE_INDEX[i]) begin
          if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
          block_line=way_map[i];
@@ -258,12 +272,12 @@ end
 begin
 				
 					//busOp =RWIM;
-					MessageToCache(GETLINE);
+					MessageToCache(SENDLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
                                         updatePLRU();
-                                        BusOperation(READ);
+                                        BusOperation(RWIM);
                                         write_count = write_count+1;
-                                        //BusOperation(opcode,address,result);
+                                        
 			
 end 
 
@@ -293,32 +307,29 @@ end
 
 3://snoop rd req miss
 begin
-				MessageToCache(SENDLINE);	
-                                    updatePLRU();
-                                    BusOperation(READ);	
+                                   result=NOHIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );	
 end
 
 4://snoop wr req miss
 begin
-		               	MessageToCache(SENDLINE);
-                                    updatePLRU();
-                                    BusOperation(READ);
+                                   result=NOHIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );;
 end
 
 5://snoop rd rwim miss
 begin
-			            MessageToCache(SENDLINE);
-                                    updatePLRU();
-                                    BusOperation(READ); 
+                                   result=NOHIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %d\n?", address,result );
 end  
 
 
-6://snoop invalidate miss
+/*6://snoop invalidate miss
 begin
 					MessageToCache(SENDLINE);
-                                        updatePLRU();
+                                        //updatePLRU();
                                         BusOperation(READ);
-end
+end  only comes in shared state */
 
 endcase
 end
@@ -405,6 +416,28 @@ function void MessageToCache(message Message);
 `ifdef NORMAL
 $display("L2: %d %h\n", Message, Address);
 `endif
+endfunction
+
+function void reset();
+opcode='b0;
+address='b0;
+tag='b0;
+index='b0;
+block_offset='b0;
+read_count='b0;
+write_count='b0;
+miss_count='b0;
+hit='b0;
+hit_count='b0;
+hit_ratio='b0;
+
+    
+        foreach (cache[index].CACHE_INDEX[i]) begin
+            cache[index].CACHE_INDEX[i].tag='b0;
+            cache[index].CACHE_INDEX[i].MESI_BITS='b0;
+            cache[index].PLRU='b0;
+        end
+  
 endfunction
 
 endmodule
