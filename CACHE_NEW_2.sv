@@ -17,8 +17,8 @@ module cache_simulator;
     logic [TAG_BITS-1:0] tag;
     logic [INDEX_BITS-1:0] index;
     logic [BLOCK_OFFSET_BITS-1:0] block_offset;
-    bit [3:0] way_map;
-    integer block_line;
+    bit [3:0] way_map[15:0];
+    bit [3:0] block_line;
     integer read_count;
     integer write_count;
     integer miss_count;
@@ -71,7 +71,7 @@ foreach (cache[index].CACHE_INDEX[i]) begin
 block_line=i;
          if (cache[index].CACHE_INDEX[i].MESI_BITS != I && (cache[index].CACHE_INDEX[i].tag == tag)) begin
                 hit = 1;  // Cache hit 
-                break;
+               // break;
         end
 end
 
@@ -115,17 +115,17 @@ way_map[15]=4'b1111;
 
 end
 
-function automatic void updatePLRU(ref bit[14:0]PLRU,[3:0]way_map);
+function automatic void updatePLRU(ref bit[14:0]PLRU,[3:0]find_way);
 
     int index=0; //PLRU index
     for (int i = 3; i >=0; i--) begin
-    if (way_map[i]==0)begin
-    PLRU[index]=way_map[i];
+    if (find_way[i]==0)begin
+    PLRU[index]=find_way[i];
     index = (2 * index) + 1;
     end
     
     else begin
-    PLRU[index]=way_map[i];
+    PLRU[index]=find_way[i];
     index=(2*index)+2;   
 end
 end
@@ -145,7 +145,7 @@ function automatic bit [3:0] victim_way(ref bit[14:0]PLRU);
        begin
         PLRU[index] = 0; 
         victim[i]=0;
-        index = 2 * index + 1;        
+        index = (2 * index) + 1;        
        end
     end
     return victim;
