@@ -12,6 +12,7 @@ module cache_simulator;
     integer status;
 
      //Cache simulator variables
+    cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache set
     logic [1:0] opcode;
     logic [31:0] address;
     logic [TAG_BITS-1:0] tag;
@@ -24,7 +25,8 @@ module cache_simulator;
     integer miss_count;
     integer hit;
     integer hit_count;
-    integer hit_ratio; 
+    integer hit_ratio;
+    int plru_index=0; //PLRU index
  
     initial begin
    
@@ -68,10 +70,10 @@ tag = address[31:BLOCK_OFFSET_BITS + INDEX_BITS];  //tag 12 bits
 hit = 0; 
 
 foreach (cache[index].CACHE_INDEX[i]) begin
-block_line=i;
          if (cache[index].CACHE_INDEX[i].MESI_BITS != I && (cache[index].CACHE_INDEX[i].tag == tag)) begin
                 hit = 1;  // Cache hit 
-               // break;
+                block_line=i;
+                break;
         end
 end
 
@@ -84,6 +86,16 @@ end
 
 else begin
          miss_count=miss_count+1;
+foreach (cache[index].CACHE_INDEX[i]) begin
+         if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
+         block_line=i;
+         cache[index].CACHE_INDEX[block_line].tag=tag;
+         end
+        else begin
+        block_line=victim_way();
+        cache[index].CACHE_INDEX[block_line].tag=tag;
+        end
+end
 
 //add mesi miss conditions
 end
@@ -115,37 +127,38 @@ way_map[15]=4'b1111;
 
 end
 
-function automatic void updatePLRU(ref bit[14:0]PLRU,[3:0]find_way);
+function void updatePLRU();
+//function automatic void updatePLRU(ref bit[14:0]PLRU,[3:0]find_way);
 
-    int index=0; //PLRU index
     for (int i = 3; i >=0; i--) begin
-    if (find_way[i]==0)begin
-    PLRU[index]=find_way[i];
-    index = (2 * index) + 1;
+    if (block_line[i]==0)begin
+    cache[index].PLRU[plru_index]=block_line[i];
+    plru_index = (2 * plru_index) + 1;
     end
     
     else begin
-    PLRU[index]=find_way[i];
-    index=(2*index)+2;   
+    cache[index].PLRU[plru_index]=block_line[i];
+    plru_index=(2*plru_index)+2;  
 end
 end
 endfunction
 
-function automatic bit [3:0] victim_way(ref bit[14:0]PLRU);
-    int index=0; //PLRU index
+function bit [3:0] victim_way();
+//function automatic bit [3:0] victim_way(ref bit[14:0]PLRU);
+    
     bit [3:0]victim;
     for (int i = 3; i >=0; i--) begin
-      if (PLRU[index] == 0) //when access way is left victim way is right so we update inverted values
+      if (cache[index].PLRU[plru_index] == 0) //when access way is left victim way is right so we update inverted values
        begin
-        PLRU[index] = 1;
+        cache[index].PLRU[plru_index] = 1;
         victim[i]=1;
-        index = 2 * index + 2;        
+        plru_index = 2 * plru_index + 2;        
        end 
       else ////when access way is right victim way is left so we update inverted values
        begin
-        PLRU[index] = 0; 
+        cache[index].PLRU[plru_index] = 0; 
         victim[i]=0;
-        index = (2 * index) + 1;        
+        plru_index = (2 * plru_index) + 1;        
        end
     end
     return victim;
