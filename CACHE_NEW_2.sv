@@ -88,7 +88,7 @@ else begin
          miss_count=miss_count+1;
 foreach (cache[index].CACHE_INDEX[i]) begin
          if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-         block_line=i;
+         block_line=way_map[i];
          cache[index].CACHE_INDEX[block_line].tag=tag;
          end
         else begin
