@@ -1,0 +1,58 @@
+Reading pref.tcl
+
+# 2021.3_1
+
+# vsim -c "+trace_file=sample_trace.din" cache_simulator -do "run -all" 
+# Start time: 15:47:50 on Dec 08,2024
+# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# //  Questa Sim-64
+# //  Version 2021.3_1 linux_x86_64 Aug 15 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.cache_config_pkg(fast)
+# Loading work.CACHE_NEW_2_sv_unit(fast)
+# Loading work.cache_simulator(fast)
+# run -all
+# Successfully opened the trace file 'sample_trace.din'.
+# L2:           1 0badbad0
+# 
+# BusOp: 0, Address: badbad0, Snoop Result: 1
+# L2:           3 1badbad2
+# 
+# L2:           1 1badbad2
+# 
+# BusOp: 0, Address: 1badbad2, Snoop Result: 0
+# L2:           3 2badbad0
+# 
+# L2:           0 2badbad0
+# 
+# BusOp: 3, Address: 2badbad0, Snoop Result: 0
+# L2:           3 0badbad0
+# 
+# MESI_1 inc  0
+# MESI_1 inc  0
+# L2:           3 1badbad1
+# 
+# L2:           3 2badbad0
+# 
+# MESI_1 inc  0
+# Sucessfully parsed
+# Cache hit ratio = 0.272727
+# Number of cache reads= 2
+# Number of cache writes = 2
+# Number of cache hits 3.000000
+# Number of cache misss 8.000000
+# Finished reading the file.
+VSIM 2> # Break key hit
+# Break key hit
