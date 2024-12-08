@@ -15,7 +15,7 @@ module cache_simulator;
     cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache set
     integer opcode='b0;
     logic [31:0] address='b0;
-    logic [TAG_BITS-1:0] tag='b0;
+    logic [TAG_BITS-1:0] tag;
     logic [INDEX_BITS-1:0] index='b0;
     logic [BLOCK_OFFSET_BITS-1:0] block_offset='b0;
     bit [3:0] way_map[15:0];
@@ -80,17 +80,20 @@ index = address[BLOCK_OFFSET_BITS + INDEX_BITS-1:BLOCK_OFFSET_BITS];  //index 14
 tag = address[31:BLOCK_OFFSET_BITS + INDEX_BITS];  //tag 12 bits
 
 
-    foreach (cache[index].CACHE_INDEX[i]) begin
-        cache[index].CACHE_INDEX[i].tag = '0;  //rbharadw debug
-    end
+    //foreach (cache[index].CACHE_INDEX[i]) begin
+    //    cache[index].CACHE_INDEX[i].tag = '0;  //rbharadw debug
+    //end
 
 
 foreach (cache[index].CACHE_INDEX[i]) begin
+
          if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
+         //$display("MESI inc %d",cache[index].CACHE_INDEX[block_line].MESI_BITS);
+         //$display("My cache tage inc %h, and recived tag %h",cache[index].CACHE_INDEX[block_line].tag,tag);
           if(cache[index].CACHE_INDEX[i].tag == tag) begin
                 hit = 1'b1;  // Cache hit
-$display("hit inc %d",hit);
                 block_line=i;
+                $display("MESI_1 inc %d",cache[index].CACHE_INDEX[i].MESI_BITS);
                 break;
          end
         end
@@ -105,13 +108,13 @@ if (hit) begin
 case(opcode)
 9:  //print contents and state of each valid cache line (doesn?t end simulation!)
 begin
-foreach (cache[index].CACHE_INDEX[i]) begin
+  foreach (cache[index].CACHE_INDEX[i]) begin
          if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
-                                `ifdef NORMAL
+         `ifdef NORMAL
          $display("printing contents and state of each valid cache line %h,%h,%h,%b",index,tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS);
-                                 `endif
+          `endif
         end
-end
+   end
 end
 endcase
 
@@ -126,17 +129,21 @@ end
 begin
 
 
-				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+                                begin
+
 					MessageToCache(SENDLINE);
                                         updatePLRU(); 
                                          
 				end
-			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+                               begin
 					MessageToCache(SENDLINE);
                                         updatePLRU();
                                                                     
 				end
-				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+                                begin
 				    MessageToCache(SENDLINE);
                                      updatePLRU();
                                     
@@ -146,18 +153,21 @@ end
 
 1://wr req from l1 hit       
 begin
-                if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
+                if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+                               begin
 					
 					MessageToCache(GETLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
                                         updatePLRU();
                                         BusOperation(INVALIDATE);
 				end
-			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+                                begin
                                         updatePLRU(); 
 				end
 
-				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+                                begin
 				    MessageToCache(GETLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
                                         updatePLRU();
@@ -168,16 +178,19 @@ end
 
 2://rd req instr from l1 hit
 begin
-				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+                                begin
 					MessageToCache(SENDLINE); 
                                         updatePLRU();
 				end
-			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+                                begin
 					MessageToCache(SENDLINE);
                                         updatePLRU(); 
                                         
 				end
-				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+                                begin
 				    MessageToCache(SENDLINE);
                                         updatePLRU();
                                     
@@ -187,25 +200,28 @@ end
 
 3://snoop rd req hit
 begin
-				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+                                begin
 					 
-                                        result=HIT; //put snoop
+                                 result=HIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %d", address,result ); 
                                  `endif				
-end
+                                 end
 
-				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+                                 begin
 					
 					MessageToCache(GETLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = S; 
                                         BusOperation(WRITE);
-                                    result=HITM; //put snoop
+                                        result=HITM; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
                                  `endif
 				end
-				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+                                begin
                                         
                                         cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
                                         result=HIT; //put snoop
@@ -219,33 +235,40 @@ end
 
 5://snoop rd rwim hit
 begin
-				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
+				if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+			        begin
 					
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
-                                    MessageToCache(INVALIDATELINE);
+                                   MessageToCache(INVALIDATELINE);
                                    result=HIT; //put snoop
+
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %d", address,result);
-                                 `endif                                      
+                                 `endif     
+                                 
 				end
 
-				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)begin
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+ 				begin
 					
 					MessageToCache(GETLINE);	
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = I; 
                                         BusOperation(WRITE);
                                         MessageToCache(INVALIDATELINE);
-                                   result=HITM; //put snoop
+                                        result=HITM; //put snoop
+
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
                                  `endif
 				end
 
-				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)begin
+				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+                                begin
 
                                         cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
                                    MessageToCache(INVALIDATELINE);
                                    result=HIT; //put snoop
+
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
                                  `endif
@@ -254,14 +277,15 @@ end
 
 6://snoop invalidate hit
 begin
-            if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) begin
+            if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) 
+                                begin
 					MessageToCache(INVALIDATELINE);
 				        cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
                                    result=HIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
                                  `endif
-			end
+		               	end
 end
 
 endcase
@@ -270,14 +294,22 @@ end
 else begin
          miss_count=miss_count+1;
 
-foreach (cache[index].CACHE_INDEX[i]) begin
-         if (cache[index].CACHE_INDEX[i].MESI_BITS == I) begin
-         block_line=way_map[i];
+foreach (cache[index].CACHE_INDEX[i]) 
+begin
+
+         if (cache[index].CACHE_INDEX[i].MESI_BITS == I) 
+         begin
+
+         //block_line=way_map[i];
+         block_line=i;
          cache[index].CACHE_INDEX[block_line].tag=tag;
+
          end
-        else begin
+        else
+        begin
         block_line=victim_way();
         cache[index].CACHE_INDEX[block_line].tag=tag;
+//$display("miss tag inc %h, original tag %h",cache[index].CACHE_INDEX[block_line].tag,tag);
 	MessageToCache(EVICTLINE);
         end
 end
@@ -295,7 +327,7 @@ if(result==NOHIT) begin
                                     updatePLRU();
                                     BusOperation(READ);
                                     read_count = read_count+1; 
-             end
+                  end
 
 
 else begin
@@ -303,9 +335,10 @@ else begin
 			                cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
                                         updatePLRU();
                                         BusOperation(READ);
-                                        read_count = read_count+1; 					
+                                        read_count = read_count+1; 
+					
 
-             end
+      end
 end
 
 1://wr req from l1 miss
@@ -331,7 +364,7 @@ if(result==NOHIT) begin
                                     updatePLRU();
                                     BusOperation(READ);
                                     read_count = read_count+1; 
-             end
+                   end
 
 
 else begin
@@ -339,9 +372,10 @@ else begin
 			                cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
                                         updatePLRU();
                                         BusOperation(READ);
-                                        read_count = read_count+1; 					
+                                        read_count = read_count+1;
+                            $display("debug stmt mesi %d",cache[index].CACHE_INDEX[block_line].MESI_BITS); 					
 
-             end
+     end
 
 end
 
@@ -385,7 +419,7 @@ hit_ratio= hit_count/(hit_count+miss_count);
 end
 endfunction
 
-initial
+/*initial
 begin
 
 way_map[0]=4'b0000;
@@ -405,7 +439,7 @@ way_map[13]=4'b1101;
 way_map[14]=4'b1110;
 way_map[15]=4'b1111;
 
-end
+end*/
 
 function void updatePLRU();
 //function automatic void updatePLRU(ref bit[14:0]PLRU,[3:0]find_way);
@@ -419,7 +453,7 @@ function void updatePLRU();
     else begin
     cache[index].PLRU[plru_index]=block_line[i];
     plru_index=(2*plru_index)+2;  
-end
+    end
 end
 endfunction
 
@@ -466,23 +500,21 @@ $display("L2: %d %h\n", Message, address);
 endfunction
 
 function void reset();
-opcode='b0;
-address='b0;
-tag='b0;
-index='b0;
-block_offset='b0;
+
 read_count='b0;
 write_count='b0;
 miss_count='b0;
 hit='b0;
 hit_count='b0;
-hit_ratio='b0;
+
 
     
-        foreach (cache[index].CACHE_INDEX[i]) begin
-            cache[index].CACHE_INDEX[i].tag='b0;
-            cache[index].CACHE_INDEX[i].MESI_BITS='b0;
-            cache[index].PLRU='b0;
+        for (int j=0;j<NUM_SETS;j++) begin
+        for(int i=0;i<16;i++)begin
+            cache[j].CACHE_INDEX[i].tag=0;
+            cache[j].CACHE_INDEX[i].MESI_BITS=I;
+            cache[j].PLRU=0;
+        end
         end
   
 endfunction
