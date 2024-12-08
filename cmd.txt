@@ -1,7 +1,0 @@
-//passing file through cmds
-vsim -c -do "run -all" work.trace_reader +input_file=rwims.din +define+DEBUG
-//Default file
-vsim -c -do "run -all" work.trace_reader
-///////////////////////////////////////////////////////////////////////////////////////
-vlog -work work /u/rbharadw/MSD_Project/work/MSD_Branch/Cache.sv
-vsim work.cache_simulator -do "run -all; quit;"
