@@ -15,14 +15,13 @@ typedef enum { NOHIT, HIT, HITM } Snoopresult;
 typedef enum { GETLINE, SENDLINE, INVALIDATELINE, EVICTLINE } message;
 
    typedef struct {
-        //logic valid;
-        //logic dirty;
         logic [TAG_BITS-1:0] tag;  // Tag field
-         mesistate [1:0] MESI_BITS;
+         mesistate [1:0] MESI_BITS=I;
     } cache_block_t;
 
  typedef struct { 
-logic [14:0] plru_tree;
+logic [14:0] PLRU;
+
 cache_block_t CACHE_INDEX [SET_ASSOCIATIVITY-1:0];
 } cache_set_t;  //15PLRU bits per each set
 
