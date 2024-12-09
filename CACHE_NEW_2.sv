@@ -478,7 +478,7 @@ function bit [3:0] victim_way();
     return victim;
   endfunction
 
-function Snoopresult GetSnoopResult_funct();
+function void GetSnoopResult_funct();
     if (address[1:0] == 2'b00)
         result = HIT;
     else if (address[1:0] == 2'b01)
