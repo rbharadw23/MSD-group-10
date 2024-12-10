@@ -88,12 +88,10 @@ tag = address[31:BLOCK_OFFSET_BITS + INDEX_BITS];  //tag 12 bits
 foreach (cache[index].CACHE_INDEX[i]) begin
 
          if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
-         //$display("MESI inc %d",cache[index].CACHE_INDEX[block_line].MESI_BITS);
-         //$display("My cache tage inc %h, and recived tag %h",cache[index].CACHE_INDEX[block_line].tag,tag);
+         
           if(cache[index].CACHE_INDEX[i].tag == tag) begin
                 hit = 1'b1;  // Cache hit
-                block_line=i;
-                $display("MESI_1 inc %d",cache[index].CACHE_INDEX[i].MESI_BITS);
+                block_line=i; 
                 break;
          end
         end
@@ -307,10 +305,10 @@ begin
          end
         else
         begin
+        MessageToCache(EVICTLINE);
         block_line=victim_way();
         cache[index].CACHE_INDEX[block_line].tag=tag;
-//$display("miss tag inc %h, original tag %h",cache[index].CACHE_INDEX[block_line].tag,tag);
-	MessageToCache(EVICTLINE);
+//$display("miss tag inc %h, original tag %h",cache[index].CACHE_INDEX[block_line].tag,tag);	
         end
 end
 
@@ -489,13 +487,13 @@ endfunction
 
 function void BusOperation(busOp BusOP);
 `ifdef NORMAL
- $display("BusOp: %0d, Address: %0h, Snoop Result: %0d",BusOP,address,result); 
+ $display("BusOp: %0s, Address: %0h, Snoop Result: %0s",BusOP,address,result); 
 `endif
 endfunction
 
 function void MessageToCache(message Message);
 `ifdef NORMAL
-$display("L2: %d %h\n", Message, address);
+$display("L2: %s %h\n", Message, address);
 `endif
 endfunction
 
