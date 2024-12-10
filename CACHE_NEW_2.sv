@@ -108,19 +108,29 @@ function void cache_function();
                                 begin
 
 					MessageToCache(SENDLINE);
-                                        updatePLRU(block_line); 
+                                        updatePLRU(block_line);
+                `ifdef NORMAL
+                $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag); 
+                `endif
+ 
                                          
 				end
 			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
                                begin
 					MessageToCache(SENDLINE);
                                         updatePLRU(block_line);
+                `ifdef NORMAL
+                $display("Tag and state are as follows tag:%0h , updated_mesi_state:Modified",cache[index].CACHE_INDEX[block_line].tag); 
+                `endif
                                                                     
 				end
 			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
                                 begin
 				    MessageToCache(SENDLINE);
                                      updatePLRU(block_line);
+                `ifdef NORMAL
+                $display("Tag and state are as follows tag:%0h , updated_mesi_state:Exclusive",cache[index].CACHE_INDEX[block_line].tag); 
+                `endif
                                     
 				end
                                         read_count = read_count+1;
@@ -135,11 +145,17 @@ function void cache_function();
 					MessageToCache(GETLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
                                         updatePLRU(block_line);
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Modified",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
                                         BusOperation(INVALIDATE);
 				end
 			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
                                 begin
-                                        updatePLRU(block_line); 
+                                        updatePLRU(block_line);
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Modified",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
 				end
 
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
@@ -147,6 +163,10 @@ function void cache_function();
 				    MessageToCache(GETLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
                                         updatePLRU(block_line);
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Modified",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
+
                                         
 				end
                                       write_count = write_count+1;
@@ -159,17 +179,29 @@ function void cache_function();
                                 begin
 					MessageToCache(SENDLINE); 
                                         updatePLRU(block_line);
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
+
 				end
 			    else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
                                 begin
 					MessageToCache(SENDLINE);
                                         updatePLRU(block_line); 
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Modified",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
+
                                         
 				end
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
                                 begin
 				    MessageToCache(SENDLINE);
                                         updatePLRU(block_line);
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Exclusive",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
+
                                     
 				end
                                         read_count = read_count+1;
@@ -183,6 +215,8 @@ function void cache_function();
                                  result=HIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result ); 
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif				
                                  end
 
@@ -195,6 +229,8 @@ function void cache_function();
                                         result=HITM; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif
 				end
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
@@ -204,6 +240,8 @@ function void cache_function();
                                         result=HIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif
                                         
 				end
@@ -221,6 +259,8 @@ function void cache_function();
 
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result);
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Inavalid",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif     
                                  
 				end
@@ -236,6 +276,8 @@ function void cache_function();
 
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif
 				end
 
@@ -248,6 +290,7 @@ function void cache_function();
 
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
                                  `endif
                                 end
 	end 
@@ -261,6 +304,7 @@ function void cache_function();
                                    result=HIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Inalid",cache[index].CACHE_INDEX[block_line].tag);
                                  `endif
 		               	end
 	end
@@ -301,6 +345,10 @@ function void cache_function();
 				    cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
 					cache[index].CACHE_INDEX[block_line].tag=tag;
                     updatePLRU(block_line);
+                        `ifdef NORMAL
+                            $display("Tag and state are as follows tag:%0h , updated_mesi_state:Exclusive",cache[index].CACHE_INDEX[block_line].tag); 
+                        `endif
+
                     BusOperation(READ);
                     read_count = read_count+1; 
             end
@@ -315,6 +363,9 @@ function void cache_function();
 			        cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
 					cache[index].CACHE_INDEX[block_line].tag=tag;
                     updatePLRU(block_line);
+                        `ifdef NORMAL
+                            $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag); 
+                        `endif
                     BusOperation(READ);
                     read_count = read_count+1; 
 					
@@ -329,10 +380,13 @@ function void cache_function();
 						MessageToCache(EVICTLINE);
 						block_line=victim_way();
 					end
-					MessageToCache(GETLINE);
+					MessageToCache(SENDLINE);
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
 					cache[index].CACHE_INDEX[block_line].tag=tag;
                     updatePLRU(block_line);
+                    `ifdef NORMAL
+                          $display("Tag and state are as follows tag:%0h , updated_mesi_state:Modified",cache[index].CACHE_INDEX[block_line].tag); 
+                    `endif
                     BusOperation(RWIM);
                     write_count = write_count+1;
                                         
@@ -353,6 +407,10 @@ function void cache_function();
 				    cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
 					cache[index].CACHE_INDEX[block_line].tag=tag;
                                     updatePLRU(block_line);
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Exclusive",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
+
                                     BusOperation(READ);
                                     read_count = read_count+1; 
         end
@@ -367,6 +425,10 @@ function void cache_function();
 			                cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
 							cache[index].CACHE_INDEX[block_line].tag=tag;
                                         updatePLRU(block_line);
+                                        `ifdef NORMAL
+                                           $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag); 
+                                           `endif
+
                                         BusOperation(READ);
                                         read_count = read_count+1;				
 
@@ -379,6 +441,7 @@ function void cache_function();
                                    result=NOHIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
                                  `endif	
 		end
 
@@ -387,6 +450,8 @@ function void cache_function();
                                    result=NOHIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif
 		end
 
@@ -395,6 +460,8 @@ function void cache_function();
                                    result=NOHIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif
 		end  
 		6://snoop rd rwim miss
@@ -402,6 +469,8 @@ function void cache_function();
                                    result=NOHIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
+
                                  `endif
 		end  
 
@@ -467,13 +536,17 @@ endfunction
 
 function void BusOperation(busOp BusOP);
 `ifdef NORMAL
- $display("BusOp: %0s, Address: %0h, Snoop Result: %0s",BusOP,address,result); 
+ $display("BusOp: %0s, Address: %0h, Snoop Result: %0s",BusOP,address,result);
+
+ 
 `endif
 endfunction
 
 function void MessageToCache(message Message);
 `ifdef NORMAL
 $display("L2: %s %h\n", Message, address);
+
+
 `endif
 endfunction
 
@@ -498,4 +571,3 @@ hit_count='b0;
 endfunction
 
 endmodule
-
