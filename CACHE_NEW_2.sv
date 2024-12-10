@@ -34,11 +34,15 @@ module cache_simulator;
  
         file = $fopen(input_file, "r");
         if (file == 0) begin
+		`ifdef DEBUG
             $display("Error: Could not open the trace file '%s'.", input_file);
-            $finish;
+         `endif
+		 $finish;
         end 
         else begin
+		`ifdef DEBUG
             $display("Successfully opened the trace file '%s'.", input_file);
+		`endif
         end
  
         while (!$feof(file)) begin // Read the file line by line 
@@ -53,14 +57,16 @@ module cache_simulator;
         end
 
 		if (status == 2) begin // Successfully parsed the line
+		`ifdef DEBUG
             $display("Sucessfully parsed");
+		`endif
         end
 
 		$display("Cache hit ratio = %0f",hit_ratio);
 		$display("Number of cache reads= %0d",read_count);
 		$display("Number of cache writes = %0d",write_count);
-		$display("Number of cache hits %0f",hit_count);
-		$display("Number of cache misss %0f",miss_count);
+		$display("Number of cache hits %0d",hit_count);
+		$display("Number of cache miss %0d",miss_count);
 
         $fclose(file);
         $display("Finished reading the file.");
@@ -88,7 +94,7 @@ function void cache_function();
 			foreach (cache[index].CACHE_INDEX[i]) begin
 			if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
 			`ifdef NORMAL
-			$display("printing contents and state of each valid cache line %h,%h,%h,%b",index,tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS);
+			$display("printing contents and state of each valid cache line tag=0x%h, block_offset=0x%h, MESI=%d PLRU=0x%h",cache[index].CACHE_INDEX[i].tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS,cache[index].PLRU);
 			`endif
 			end
 		end
@@ -493,11 +499,17 @@ BL [3] = block_line[0];
     for (int i = 3; i >=0; i--) begin
     if (BL[i]== 1'b0)begin
     cache[index].PLRU[plru_index]=BL[i];
+	`ifdef NORMAL
+	$display("update PLRU[%d]=%d \n",plru_index,BL[i]);
+	`endif
     plru_index = (2 * plru_index) + 1;
     end
     
     else begin
     cache[index].PLRU[plru_index]=BL[i];
+	`ifdef NORMAL
+		$display("update PLRU[%d]=%d \n",plru_index,BL[i]);
+	`endif
     plru_index=(2*plru_index)+2;  
     end
 end
@@ -513,7 +525,7 @@ function logic signed [4:0] victim_way();
        begin
         //cache[index].PLRU[plru_index] = 1;
         victim[i]=1;
-        plru_index = 2 * plru_index + 2;        
+        plru_index = 2 * plru_index + 2;   		
        end 
       else ////when access way is right victim way is left so we update inverted values
        begin
@@ -522,6 +534,9 @@ function logic signed [4:0] victim_way();
         plru_index = (2 * plru_index) + 1;        
        end
     end
+	`ifdef NORMAL
+	$display ("victim_way is %d",victim);
+	`endif
     return victim;
   endfunction
 
