@@ -1,6 +1,6 @@
 # vsim -c "+trace_file=sample_trace.din" cache_simulator -do "run -all" 
-# Start time: 15:47:50 on Dec 08,2024
-# ** Note: (vsim-8009) Loading existing optimized design _opt1
+# Start time: 05:52:36 on Dec 10,2024
+# ** Note: (vsim-3812) Design is being optimized...
 # //  Questa Sim-64
 # //  Version 2021.3_1 linux_x86_64 Aug 15 2021
 # //
@@ -21,34 +21,32 @@
 # Loading work.cache_simulator(fast)
 # run -all
 # Successfully opened the trace file 'sample_trace.din'.
-# L2:           1 0badbad0
+# ** Error (suppressible): (vsim-8604) CACHE_NEW_2.sv(480): NaN (not a number) resulted from a division operation.
+# L2: SENDLINE 0badbad0
 # 
-# BusOp: 0, Address: badbad0, Snoop Result: 1
-# L2:           3 1badbad2
+# Tag and state are as follows tag:ba , updated_mesi_state:Shared
+# BusOp: READ, Address: badbad0, Snoop Result: HIT
+# L2: SENDLINE 1badbad2
 # 
-# L2:           1 1badbad2
+# Tag and state are as follows tag:1ba , updated_mesi_state:Exclusive
+# BusOp: READ, Address: 1badbad2, Snoop Result: NOHIT
+# L2: GETLINE 2badbad0
 # 
-# BusOp: 0, Address: 1badbad2, Snoop Result: 0
-# L2:           3 2badbad0
+# Tag and state are as follows tag:2ba , updated_mesi_state:Modified
+# BusOp: RWIM, Address: 2badbad0, Snoop Result: NOHIT
+# L2: INVALIDATELINE 0badbad0
 # 
-# L2:           0 2badbad0
-# 
-# BusOp: 3, Address: 2badbad0, Snoop Result: 0
-# L2:           3 0badbad0
-# 
-# MESI_1 inc  0
-# MESI_1 inc  0
-# L2:           3 1badbad1
-# 
-# L2:           3 2badbad0
-# 
-# MESI_1 inc  0
+# SnoopResult: Address 0badbad0, SnoopResult: HIT
+# Tag and state are as follows tag:ba , updated_mesi_state:Inalid
+# SnoopResult: Address 0badbad0, SnoopResult: NOHIT
+# Tag and state are as follows tag:ba , updated_mesi_state:Invalid
+# SnoopResult: Address 0badbad0, SnoopResult: NOHIT
+# Tag and state are as follows tag:ba , updated_mesi_state:Invalid
+# Tag and state are as follows tag:2ba , updated_mesi_state:Modified
 # Sucessfully parsed
-# Cache hit ratio = 0.272727
+# Cache hit ratio = 0.250000
 # Number of cache reads= 2
 # Number of cache writes = 2
-# Number of cache hits 3.000000
-# Number of cache misss 8.000000
+# Number of cache hits 1.000000
+# Number of cache misss 3.000000
 # Finished reading the file.
-# Break key hit
-# Break key hit

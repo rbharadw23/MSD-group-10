@@ -3,6 +3,9 @@ K4
 z2
 Z0 !s99 nomlopt
 R0
+R0
+R0
+R0
 !s11f vlog 2021.3_1 2021.08, Aug 15 2021
 13
 !s112 1.1
@@ -12,32 +15,43 @@ R0
 cModel Technology
 Z1 d/u/moulya/Verilog WKSP/A2
 T_opt
-!s110 1730834041
-V8N[Tn6jPeiP8WebE^=LZI2
-04 12 4 work trace_reader fast 0
-=1-525400b63b2a-672a6e78-b67ea-c49
-Z2 !s124 OEM100
-Z3 o-quiet -auto_acc_if_foreign -work work
-Z4 tCvgOpt 0
+!s110 1733838681
+Vcof`4;<eJj<^>;Tg0Wa_10
+Z2 04 15 4 work cache_simulator fast 0
+=1-525400b63b2a-67584758-c891e-1731
+Z3 !s124 OEM100
+Z4 o-quiet -auto_acc_if_foreign -work work
+Z5 tCvgOpt 0
 n@_opt
-Z5 OL;O;2021.3_1;73
+Z6 OL;O;2021.3_1;73
 R1
 T_opt1
-!s110 1733701425
-VIf7YedY;_zTKmCoeTc2T_1
-04 15 4 work cache_simulator fast 0
-=1-525400b63b2a-67562f30-8ebb6-2ce0
+!s110 1733838757
+Vn2D21I[;nC5Zo0=BY8:QV2
 R2
+=1-525400b63b2a-675847a4-7ad30-1950
 R3
 R4
-n@_opt1
 R5
+n@_opt1
+R6
+T_opt2
+!s110 1733837397
+V4@VKf`^CQD6F2OOX3H?m]0
+R2
+=1-525400b63b2a-67584254-766d6-72ac
+R3
+R4
+R5
+n@_opt2
+R6
+R1
 vcache
-Z6 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
-Z7 DXx4 work 15 parameters_defn 0 22 ^VU]agP1jkS`dPKOWINYJ3
+Z7 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z8 DXx4 work 15 parameters_defn 0 22 ^VU]agP1jkS`dPKOWINYJ3
 DXx4 work 20 cache_design_sv_unit 0 22 h2@8DV>;R7U3N2`izk1XS3
-Z8 !s110 1731969746
-Z9 VDg1SIo80bB@j0V0VzS_@n1
+Z9 !s110 1731969746
+Z10 VDg1SIo80bB@j0V0VzS_@n1
 r1
 !s85 0
 !i10b 1
@@ -45,49 +59,49 @@ r1
 IMG_`DMaK>UCMmYFWJYAJ01
 !s105 cache_design_sv_unit
 S1
-Z10 d/u/moulya/MSD/MSD/cp2_push
-Z11 w1731965361
-Z12 8/u/moulya/MSD/MSD/cp2_push/cache_design.sv
-Z13 F/u/moulya/MSD/MSD/cp2_push/cache_design.sv
+Z11 d/u/moulya/MSD/MSD/cp2_push
+Z12 w1731965361
+Z13 8/u/moulya/MSD/MSD/cp2_push/cache_design.sv
+Z14 F/u/moulya/MSD/MSD/cp2_push/cache_design.sv
 !i122 2
-Z14 L0 2 65
-Z15 OL;L;2021.3_1;73
+Z15 L0 2 65
+Z16 OL;L;2021.3_1;73
 31
-Z16 !s108 1731969746.000000
-Z17 !s107 /u/moulya/MSD/MSD/cp2_push/cache_design.sv|
-Z18 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/cp2_push/cache_design.sv|
+Z17 !s108 1731969746.000000
+Z18 !s107 /u/moulya/MSD/MSD/cp2_push/cache_design.sv|
+Z19 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/cp2_push/cache_design.sv|
 !i113 0
-Z19 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-R4
+Z20 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R5
 Xcache_config_pkg
-R6
-Z20 !s110 1733701412
+R7
+!s110 1733838750
 !i10b 1
-!s100 oVl_][<58S31gCGH@B[^F1
-I6B;N6zf_UJ`Yi2o59VkR72
+!s100 YOY[kRVHH36jb>li2>X<c1
+IIWIRa0De6l^YG?g?C4[N^0
 S1
-Z21 d/u/moulya/MSD/MSD/mrmt
-Z22 w1733701306
+Z21 d/u/moulya/MSD/mrmt
+w1733836237
 8Packages.sv
-Z23 FPackages.sv
-!i122 6
-Z24 L0 1 0
-V6B;N6zf_UJ`Yi2o59VkR72
-R15
+Z22 FPackages.sv
+!i122 15
+Z23 L0 1 0
+VIWIRa0De6l^YG?g?C4[N^0
+R16
 r1
 !s85 0
 31
-Z25 !s108 1733701412.000000
-Z26 !s107 Packages.sv|CACHE_NEW_2.sv|
-Z27 !s90 -sv|+define+NORMAL|CACHE_NEW_2.sv|
+Z24 !s108 1733838750.000000
+Z25 !s107 Packages.sv|CACHE_NEW_2.sv|
+Z26 !s90 -sv|+define+NORMAL|CACHE_NEW_2.sv|
 !i113 0
-Z28 o-sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-Z29 !s92 -sv +define+NORMAL -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-R4
+Z27 o-sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z28 !s92 -sv +define+NORMAL -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R5
 Xcache_design_sv_unit
-R6
 R7
 R8
+R9
 Vh2@8DV>;R7U3N2`izk1XS3
 r1
 !s85 0
@@ -96,103 +110,103 @@ r1
 Ih2@8DV>;R7U3N2`izk1XS3
 !i103 1
 S1
-R10
 R11
 R12
 R13
+R14
 !i122 2
-R24
-R15
-31
+R23
 R16
+31
 R17
 R18
-!i113 0
 R19
-R4
-XCACHE_NEW_2_sv_unit
-R6
-Z30 DXx4 work 16 cache_config_pkg 0 22 6B;N6zf_UJ`Yi2o59VkR72
+!i113 0
 R20
-V2K<]m?98kT@P^8_b;9loc0
+R5
+XCACHE_NEW_2_sv_unit
+R7
+Z29 DXx4 work 16 cache_config_pkg 0 22 IWIRa0De6l^YG?g?C4[N^0
+Z30 !s110 1733838751
+VUHnghB;d?9lJSj?_O13i51
 r1
 !s85 0
 !i10b 1
-!s100 3CAg8K5Who=]Jgokf;GPg1
-I2K<]m?98kT@P^8_b;9loc0
+!s100 [?Lf8>DC_`5iiZEDmP:_70
+IUHnghB;d?9lJSj?_O13i51
 !i103 1
 S1
 R21
+Z31 w1733838733
+Z32 8CACHE_NEW_2.sv
+Z33 FCACHE_NEW_2.sv
 R22
-Z31 8CACHE_NEW_2.sv
-Z32 FCACHE_NEW_2.sv
-R23
-!i122 6
+!i122 15
 L0 2 0
-R15
+R16
 31
+R24
 R25
 R26
-R27
 !i113 0
+R27
 R28
-R29
-R4
+R5
 n@c@a@c@h@e_@n@e@w_2_sv_unit
 vcache_simulator
-R6
+R7
+R29
+DXx4 work 19 CACHE_NEW_2_sv_unit 0 22 UHnghB;d?9lJSj?_O13i51
 R30
-DXx4 work 19 CACHE_NEW_2_sv_unit 0 22 2K<]m?98kT@P^8_b;9loc0
-R20
-R9
+R10
 r1
 !s85 0
 !i10b 1
-!s100 KKgPDdRVaKmJkB;01]eH93
-IYKhiP`B<`?0DimVkf;d]40
+!s100 9[SF5fV?MJRSNLCIcbGZD1
+I[4D1UjYh:6bR41CFL<5`E2
 !s105 CACHE_NEW_2_sv_unit
 S1
 R21
-R22
 R31
 R32
-!i122 6
-L0 4 519
-R15
+R33
+!i122 15
+L0 4 570
+R16
 31
+R24
 R25
 R26
-R27
 !i113 0
+R27
 R28
-R29
-R4
+R5
 Xparameters_defn
-R6
+R7
 !s110 1731969747
 !i10b 1
 !s100 @0d;RBh@Az^a4l^<eMkVA0
 I^VU]agP1jkS`dPKOWINYJ3
 S1
-R10
+R11
 w1731965402
 8/u/moulya/MSD/MSD/cp2_push/cache_parameter.sv
 F/u/moulya/MSD/MSD/cp2_push/cache_parameter.sv
 !i122 3
-R24
+R23
 V^VU]agP1jkS`dPKOWINYJ3
-R15
+R16
 r1
 !s85 0
 31
-R16
+R17
 !s107 /u/moulya/MSD/MSD/cp2_push/cache_parameter.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/cp2_push/cache_parameter.sv|
 !i113 0
-R19
-R4
+R20
+R5
 vtrace_reader
-R6
+R7
 !s110 1730833993
 !i10b 1
 !s100 iW=g0X2EV?D1V:f2WF04Q2
@@ -203,9 +217,9 @@ w1730833766
 8/u/moulya/MSD/MSD/Trace_reader.sv
 F/u/moulya/MSD/MSD/Trace_reader.sv
 !i122 0
-R14
-R9
 R15
+R10
+R16
 r1
 !s85 0
 31
@@ -213,5 +227,5 @@ r1
 !s107 /u/moulya/MSD/MSD/Trace_reader.sv|
 !s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/u/moulya/MSD/MSD/Trace_reader.sv|
 !i113 0
-R19
-R4
+R20
+R5
