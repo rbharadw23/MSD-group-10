@@ -259,7 +259,7 @@ function void cache_function();
 
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result);
-                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Inavalid",cache[index].CACHE_INDEX[block_line].tag);
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif     
                                  
@@ -304,7 +304,7 @@ function void cache_function();
                                    result=HIT; //put snoop
                                 `ifdef NORMAL
                                    $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Inalid",cache[index].CACHE_INDEX[block_line].tag);
+                                   $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
                                  `endif
 		               	end
 	end
