@@ -20,7 +20,7 @@ typedef enum { GETLINE, SENDLINE, INVALIDATELINE, EVICTLINE } message;
     } cache_block_t;
 
  typedef struct { 
-logic [14:0] PLRU;
+logic [0:14] PLRU;
 
 cache_block_t CACHE_INDEX [SET_ASSOCIATIVITY-1:0];
 } cache_set_t;  //15PLRU bits per each set
