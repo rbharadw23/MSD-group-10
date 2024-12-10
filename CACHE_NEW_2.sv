@@ -212,7 +212,7 @@ function void cache_function();
 					 
                                  result=HIT; //put snoop
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result ); 
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result ); 
                                  `endif				
                                  end
 
@@ -224,7 +224,7 @@ function void cache_function();
                                         BusOperation(WRITE);
                                         result=HITM; //put snoop
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif
 				end
 				else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
@@ -233,7 +233,7 @@ function void cache_function();
                                         cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
                                         result=HIT; //put snoop
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif
                                         
 				end
@@ -250,7 +250,7 @@ function void cache_function();
                                    result=HIT; //put snoop
 
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result);
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result);
                                  `endif     
                                  
 				end
@@ -265,7 +265,7 @@ function void cache_function();
                                         result=HITM; //put snoop
 
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif
 				end
 
@@ -277,7 +277,7 @@ function void cache_function();
                                    result=HIT; //put snoop
 
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif
                                 end
 	end 
@@ -290,7 +290,7 @@ function void cache_function();
 				        cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
                                    result=HIT; //put snoop
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif
 		               	end
 	end
@@ -315,10 +315,10 @@ function void cache_function();
         end
         else
         begin
+		MessageToCache(EVICTLINE);
         block_line=victim_way();
         cache[index].CACHE_INDEX[block_line].tag=tag;
 		//$display("miss tag inc %h, original tag %h",cache[index].CACHE_INDEX[block_line].tag,tag);
-		MessageToCache(EVICTLINE);
         end
 		end
 
@@ -381,7 +381,7 @@ function void cache_function();
                                         updatePLRU();
                                         BusOperation(READ);
                                         read_count = read_count+1;
-                            $display("debug stmt mesi %d",cache[index].CACHE_INDEX[block_line].MESI_BITS); 					
+                            $display("debug stmt mesi %s",cache[index].CACHE_INDEX[block_line].MESI_BITS); 					
 
 		end
 
@@ -391,7 +391,7 @@ function void cache_function();
 		begin
                                    result=NOHIT; //put snoop
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif	
 		end
 
@@ -399,7 +399,7 @@ function void cache_function();
 		begin
                                    result=NOHIT; //put snoop
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif
 		end
 
@@ -407,7 +407,7 @@ function void cache_function();
 		begin
                                    result=NOHIT; //put snoop
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %d", address,result );
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                  `endif
 		end  
 
@@ -496,13 +496,13 @@ endfunction
 
 function void BusOperation(busOp BusOP);
 `ifdef NORMAL
- $display("BusOp: %0d, Address: %0h, Snoop Result: %0d",BusOP,address,result); 
+ $display("BusOp: %0s, Address: %0h, Snoop Result: %0s",BusOP,address,result); 
 `endif
 endfunction
 
 function void MessageToCache(message Message);
 `ifdef NORMAL
-$display("L2: %d %h\n", Message, address);
+$display("L2: %s %h\n", Message, address);
 `endif
 endfunction
 
