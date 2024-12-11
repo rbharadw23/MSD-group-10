@@ -16,7 +16,7 @@ typedef enum { GETLINE, SENDLINE, INVALIDATELINE, EVICTLINE } message;
 
    typedef struct {
         logic [TAG_BITS-1:0] tag;  // Tag field
-         mesistate [1:0] MESI_BITS=I;
+         mesistate  MESI_BITS=I;
     } cache_block_t;
 
  typedef struct { 
