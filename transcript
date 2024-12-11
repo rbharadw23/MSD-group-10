@@ -1,10 +1,6 @@
-# vsim -c "+trace_file=sample_trace.din" cache_simulator -do "run -all" 
-# Start time: 11:49:08 on Dec 10,2024
+# vsim -c "+trace_file=t7.din" cache_simulator -do "run -all" 
+# Start time: 19:08:48 on Dec 10,2024
 # ** Note: (vsim-3812) Design is being optimized...
-# ** Warning: CACHE_NEW_2.sv(320): (vopt-2240) Treating stand-alone use of function 'GetSnoopResult_funct' as an implicit VOID cast.
-# ** Warning: CACHE_NEW_2.sv(357): (vopt-2240) Treating stand-alone use of function 'GetSnoopResult_funct' as an implicit VOID cast.
-# ** Warning: CACHE_NEW_2.sv(479): (vopt-2250) Function "GetSnoopResult_funct" has no return value assignment.
-# ** Note: (vsim-12126) Error and warning message counts have been restored: Errors=0, Warnings=3.
 # //  Questa Sim-64
 # //  Version 2021.3_1 linux_x86_64 Aug 15 2021
 # //
@@ -21,33 +17,119 @@
 # //
 # Loading sv_std.std
 # Loading work.cache_config_pkg(fast)
-# Loading work.CACHE_NEW_2_sv_unit(fast)
+# Loading work.CACHE_NEW_3_sv_unit(fast)
 # Loading work.cache_simulator(fast)
 # run -all
-# Successfully opened the trace file 'sample_trace.din'.
-# L2: SENDLINE 0badbad0
+# L2: SENDLINE 00000000
+# tag:0 , MESI=M
+# BusOp: RWIM, Address: 0, Snoop Result: HIT 
 # 
-# BusOp: READ, Address: badbad0, Snoop Result: HIT
-# L2: EVICTLINE 1badbad2
+# L2: SENDLINE 00200001
+# tag:2 , MESI=M
+# BusOp: RWIM, Address: 200001, Snoop Result: HITM 
 # 
-# L2: SENDLINE 1badbad2
+# L2: SENDLINE 00400002
+# tag:4 , MESI=M
+# BusOp: RWIM, Address: 400002, Snoop Result: NOHIT 
 # 
-# BusOp: READ, Address: 1badbad2, Snoop Result: NOHIT
-# L2: EVICTLINE 2badbad0
+# L2: SENDLINE 00600003
+# tag:6 , MESI=M
+# BusOp: RWIM, Address: 600003, Snoop Result: NOHIT 
 # 
-# L2: GETLINE 2badbad0
+# L2: SENDLINE 00800004
+# tag:8 , MESI=M
+# BusOp: RWIM, Address: 800004, Snoop Result: HIT 
 # 
-# BusOp: RWIM, Address: 2badbad0, Snoop Result: NOHIT
-# L2: EVICTLINE 0badbad0
+# L2: SENDLINE 00a00005
+# tag:a , MESI=M
+# BusOp: RWIM, Address: a00005, Snoop Result: HITM 
 # 
-# L2: EVICTLINE 1badbad1
+# L2: SENDLINE 00c00006
+# tag:c , MESI=M
+# BusOp: RWIM, Address: c00006, Snoop Result: NOHIT 
 # 
-# L2: EVICTLINE 2badbad0
+# L2: SENDLINE 00e00007
+# tag:e , MESI=M
+# BusOp: RWIM, Address: e00007, Snoop Result: NOHIT 
 # 
-# Sucessfully parsed
-# Cache hit ratio = 0.272727
-# Number of cache reads= 2
-# Number of cache writes = 2
-# Number of cache hits 3.000000
-# Number of cache misss 8.000000
+# L2: SENDLINE 01000000
+# tag:10 , MESI=M
+# BusOp: RWIM, Address: 1000000, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01200001
+# tag:12 , MESI=M
+# BusOp: RWIM, Address: 1200001, Snoop Result: HITM 
+# 
+# L2: SENDLINE 01400002
+# tag:14 , MESI=M
+# BusOp: RWIM, Address: 1400002, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 01600003
+# tag:16 , MESI=M
+# BusOp: RWIM, Address: 1600003, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 01800004
+# tag:18 , MESI=M
+# BusOp: RWIM, Address: 1800004, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01a00005
+# tag:1a , MESI=M
+# BusOp: RWIM, Address: 1a00005, Snoop Result: HITM 
+# 
+# L2: SENDLINE 01c00006
+# tag:1c , MESI=M
+# BusOp: RWIM, Address: 1c00006, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 01e00007
+# tag:1e , MESI=M
+# BusOp: RWIM, Address: 1e00007, Snoop Result: NOHIT 
+# 
+# tag:10 , MESI=M
+# index=0x00000000 , way=0x00000000 ,tag=0x01e, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000001 ,tag=0x01c, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000002 ,tag=0x01a, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000003 ,tag=0x018, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000004 ,tag=0x016, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000005 ,tag=0x014, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000006 ,tag=0x012, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000007 ,tag=0x010, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000008 ,tag=0x00e, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x00000009 ,tag=0x00c, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x0000000a ,tag=0x00a, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x0000000b ,tag=0x008, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x0000000c ,tag=0x006, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x0000000d ,tag=0x004, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x0000000e ,tag=0x002, MESI=M PLRU=0x000000001000101
+# index=0x00000000 , way=0x0000000f ,tag=0x000, MESI=M PLRU=0x000000001000101
+# L2: EVICTLINE 02000002
+# L2: SENDLINE 02000002
+# tag:20 , MESI=E
+# BusOp: READ, Address: 2000002, Snoop Result: NOHIT 
+# 
+# index=0x00000000 , way=0x00000000 ,tag=0x01e, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000001 ,tag=0x01c, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000002 ,tag=0x01a, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000003 ,tag=0x018, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000004 ,tag=0x016, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000005 ,tag=0x014, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000006 ,tag=0x020, MESI=E PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000007 ,tag=0x010, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000008 ,tag=0x00e, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x00000009 ,tag=0x00c, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x0000000a ,tag=0x00a, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x0000000b ,tag=0x008, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x0000000c ,tag=0x006, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x0000000d ,tag=0x004, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x0000000e ,tag=0x002, MESI=M PLRU=0x000000001010110
+# index=0x00000000 , way=0x0000000f ,tag=0x000, MESI=M PLRU=0x000000001010110
+# Cache hit ratio = 0.055556
+# Number of cache reads= 1
+# Number of cache writes = 17
+# Number of cache hits 1.000000
+# Number of cache misss 17.000000
+# Number of cache hits 1
+# Number of cache miss 17
 # Finished reading the file.
+# Break key hit
+# Break key hit
+# Break key hit

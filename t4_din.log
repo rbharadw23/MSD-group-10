@@ -1,0 +1,115 @@
+bash-4.2$ vsim -c +trace_file=t4.din cache_simulator -do "run -all"
+Reading pref.tcl
+
+# 2021.3_1
+
+# vsim -c "+trace_file=t4.din" cache_simulator -do "run -all" 
+# Start time: 19:07:40 on Dec 10,2024
+# ** Note: (vsim-3812) Design is being optimized...
+# //  Questa Sim-64
+# //  Version 2021.3_1 linux_x86_64 Aug 15 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.cache_config_pkg(fast)
+# Loading work.CACHE_NEW_3_sv_unit(fast)
+# Loading work.cache_simulator(fast)
+# run -all
+# L2: SENDLINE 00000080
+# tag:0 , MESI=M
+# BusOp: RWIM, Address: 80, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00200080
+# tag:2 , MESI=M
+# BusOp: RWIM, Address: 200080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00400080
+# tag:4 , MESI=M
+# BusOp: RWIM, Address: 400080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00600080
+# tag:6 , MESI=M
+# BusOp: RWIM, Address: 600080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00800080
+# tag:8 , MESI=M
+# BusOp: RWIM, Address: 800080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00a00080
+# tag:a , MESI=M
+# BusOp: RWIM, Address: a00080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00c00080
+# tag:c , MESI=M
+# BusOp: RWIM, Address: c00080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00e00080
+# tag:e , MESI=M
+# BusOp: RWIM, Address: e00080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01000080
+# tag:10 , MESI=M
+# BusOp: RWIM, Address: 1000080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01200080
+# tag:12 , MESI=M
+# BusOp: RWIM, Address: 1200080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01400080
+# tag:14 , MESI=M
+# BusOp: RWIM, Address: 1400080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01600080
+# tag:16 , MESI=M
+# BusOp: RWIM, Address: 1600080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01800080
+# tag:18 , MESI=M
+# BusOp: RWIM, Address: 1800080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01a00080
+# tag:1a , MESI=M
+# BusOp: RWIM, Address: 1a00080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01c00080
+# tag:1c , MESI=M
+# BusOp: RWIM, Address: 1c00080, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01e00080
+# tag:1e , MESI=M
+# BusOp: RWIM, Address: 1e00080, Snoop Result: HIT 
+# 
+# index=0x00000002 , way=0x00000000 ,tag=0x01e, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000001 ,tag=0x01c, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000002 ,tag=0x01a, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000003 ,tag=0x018, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000004 ,tag=0x016, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000005 ,tag=0x014, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000006 ,tag=0x012, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000007 ,tag=0x010, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000008 ,tag=0x00e, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x00000009 ,tag=0x00c, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x0000000a ,tag=0x00a, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x0000000b ,tag=0x008, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x0000000c ,tag=0x006, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x0000000d ,tag=0x004, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x0000000e ,tag=0x002, MESI=M PLRU=0x000000000000000
+# index=0x00000002 , way=0x0000000f ,tag=0x000, MESI=M PLRU=0x000000000000000
+# Cache hit ratio = 0.000000
+# Number of cache reads= 0
+# Number of cache writes = 16
+# Number of cache hits 0.000000
+# Number of cache misss 16.000000
+# Number of cache hits 0
+# Number of cache miss 16
+# Finished reading the file.

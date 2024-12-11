@@ -1,0 +1,133 @@
+# vsim -c "+trace_file=t5.din" cache_simulator -do "run -all" 
+# Start time: 18:56:31 on Dec 10,2024
+# ** Note: (vsim-3812) Design is being optimized...
+# //  Questa Sim-64
+# //  Version 2021.3_1 linux_x86_64 Aug 15 2021
+# //
+# //  Copyright 1991-2021 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.cache_config_pkg(fast)
+# Loading work.CACHE_NEW_3_sv_unit(fast)
+# Loading work.cache_simulator(fast)
+# run -all
+# L2: SENDLINE 00000000
+# tag:0 , MESI=S
+# BusOp: READ, Address: 0, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00200001
+# tag:2 , MESI=S
+# BusOp: READ, Address: 200001, Snoop Result: HITM 
+# 
+# L2: SENDLINE 00400002
+# tag:4 , MESI=E
+# BusOp: READ, Address: 400002, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 00600003
+# tag:6 , MESI=E
+# BusOp: READ, Address: 600003, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 00800004
+# tag:8 , MESI=S
+# BusOp: READ, Address: 800004, Snoop Result: HIT 
+# 
+# L2: SENDLINE 00a00005
+# tag:a , MESI=S
+# BusOp: READ, Address: a00005, Snoop Result: HITM 
+# 
+# L2: SENDLINE 00c00006
+# tag:c , MESI=E
+# BusOp: READ, Address: c00006, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 00e00007
+# tag:e , MESI=E
+# BusOp: READ, Address: e00007, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 01000000
+# tag:10 , MESI=S
+# BusOp: READ, Address: 1000000, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01200001
+# tag:12 , MESI=S
+# BusOp: READ, Address: 1200001, Snoop Result: HITM 
+# 
+# L2: SENDLINE 01400002
+# tag:14 , MESI=E
+# BusOp: READ, Address: 1400002, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 01600003
+# tag:16 , MESI=E
+# BusOp: READ, Address: 1600003, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 01800004
+# tag:18 , MESI=S
+# BusOp: READ, Address: 1800004, Snoop Result: HIT 
+# 
+# L2: SENDLINE 01a00005
+# tag:1a , MESI=S
+# BusOp: READ, Address: 1a00005, Snoop Result: HITM 
+# 
+# L2: SENDLINE 01c00006
+# tag:1c , MESI=E
+# BusOp: READ, Address: 1c00006, Snoop Result: NOHIT 
+# 
+# L2: SENDLINE 01e00007
+# tag:1e , MESI=E
+# BusOp: READ, Address: 1e00007, Snoop Result: NOHIT 
+# 
+# L2: GETLINE 00c00000
+# tag:c , MESI=M
+# index=0x00000000 , way=0x00000000 ,tag=0x01e, MESI=E PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000001 ,tag=0x01c, MESI=E PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000002 ,tag=0x01a, MESI=S PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000003 ,tag=0x018, MESI=S PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000004 ,tag=0x016, MESI=E PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000005 ,tag=0x014, MESI=E PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000006 ,tag=0x012, MESI=S PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000007 ,tag=0x010, MESI=S PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000008 ,tag=0x00e, MESI=E PLRU=0x000100000000001
+# index=0x00000000 , way=0x00000009 ,tag=0x00c, MESI=M PLRU=0x000100000000001
+# index=0x00000000 , way=0x0000000a ,tag=0x00a, MESI=S PLRU=0x000100000000001
+# index=0x00000000 , way=0x0000000b ,tag=0x008, MESI=S PLRU=0x000100000000001
+# index=0x00000000 , way=0x0000000c ,tag=0x006, MESI=E PLRU=0x000100000000001
+# index=0x00000000 , way=0x0000000d ,tag=0x004, MESI=E PLRU=0x000100000000001
+# index=0x00000000 , way=0x0000000e ,tag=0x002, MESI=S PLRU=0x000100000000001
+# index=0x00000000 , way=0x0000000f ,tag=0x000, MESI=S PLRU=0x000100000000001
+# L2: EVICTLINE 02000000
+# L2: SENDLINE 02000000
+# tag:20 , MESI=S
+# BusOp: READ, Address: 2000000, Snoop Result: HIT 
+# 
+# index=0x00000000 , way=0x00000000 ,tag=0x01e, MESI=E PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000001 ,tag=0x01c, MESI=E PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000002 ,tag=0x01a, MESI=S PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000003 ,tag=0x018, MESI=S PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000004 ,tag=0x016, MESI=E PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000005 ,tag=0x014, MESI=E PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000006 ,tag=0x020, MESI=S PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000007 ,tag=0x010, MESI=S PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000008 ,tag=0x00e, MESI=E PLRU=0x000100000010010
+# index=0x00000000 , way=0x00000009 ,tag=0x00c, MESI=M PLRU=0x000100000010010
+# index=0x00000000 , way=0x0000000a ,tag=0x00a, MESI=S PLRU=0x000100000010010
+# index=0x00000000 , way=0x0000000b ,tag=0x008, MESI=S PLRU=0x000100000010010
+# index=0x00000000 , way=0x0000000c ,tag=0x006, MESI=E PLRU=0x000100000010010
+# index=0x00000000 , way=0x0000000d ,tag=0x004, MESI=E PLRU=0x000100000010010
+# index=0x00000000 , way=0x0000000e ,tag=0x002, MESI=S PLRU=0x000100000010010
+# index=0x00000000 , way=0x0000000f ,tag=0x000, MESI=S PLRU=0x000100000010010
+# Cache hit ratio = 0.055556
+# Number of cache reads= 17
+# Number of cache writes = 1
+# Number of cache hits 1.000000
+# Number of cache misss 17.000000
+# Number of cache hits 1
+# Number of cache miss 17
+# Finished reading the file.
