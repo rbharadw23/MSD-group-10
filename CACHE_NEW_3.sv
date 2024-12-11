@@ -94,19 +94,19 @@ end
 end
 
 if (opcode == 9) begin
-foreach (cache[index].CACHE_INDEX[i]) begin
+/*foreach (cache[index].CACHE_INDEX[i]) begin
 if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
 	
-			$display("index=0x%h , line=0x%h ,tag=0x%h, block_offset=0x%h, MESI=%s PLRU=0x%b",index,i,cache[index].CACHE_INDEX[i].tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS.name(),cache[index].PLRU);
+			//$display("index=0x%h , line=0x%h ,tag=0x%h, block_offset=0x%h, MESI=%s PLRU=0x%b",index,i,cache[index].CACHE_INDEX[i].tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS.name(),cache[index].PLRU);
 
-end
-else begin
-                         i=block_line;
-                        $display("index=0x%h , line=0x%h ,tag=0x%h, block_offset=0x%h, MESI=%s PLRU=0x%b",index,i,cache[index].CACHE_INDEX[i].tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS.name(),cache[index].PLRU);
-                        end
+//end
 
-end
-end else if (opcode ==  8) begin
+end*/
+cache_contents();
+
+end 
+
+else if (opcode ==  8) begin
 reset();
 end else
 if (hit) begin 
@@ -377,7 +377,7 @@ end
 1://wr req from l1 miss
 begin
 miss_count=miss_count+1;
-
+GetSnoopResult_funct();
 if (block_line == -1) begin
 MessageToCache(EVICTLINE);
 block_line=victim_way();
@@ -579,4 +579,17 @@ end
 end
 
 endfunction
+
+  	function void cache_contents();
+    		int i, j;	
+    		for (i = 0; i < 16384 ; i++) begin
+      			for (j = 0; j < 16; j++) begin
+        			if(!(cache[i].CACHE_INDEX[j].MESI_BITS == I))				
+					//$display("Cache[%0d][%0d] = [%0h][%0s]",i,j,cache[i].lines[j].Tag,cache[i].lines[j].MESI.name());
+					$display("index=0x%h , way=0x%h ,tag=0x%h, MESI=%s PLRU=0x%b",i,j,cache[i].CACHE_INDEX[j].tag,cache[i].CACHE_INDEX[j].MESI_BITS.name(),cache[i].PLRU);
+     				end
+   		 end
+  	endfunction
+
+
 endmodule
