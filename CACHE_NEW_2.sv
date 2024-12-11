@@ -91,11 +91,12 @@ function void cache_function();
 	end
 
 	if (opcode == 9) begin
+				$display("Printing contents and state of each valid cache line");
+
 			foreach (cache[index].CACHE_INDEX[i]) begin
 			if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
-			`ifdef NORMAL
-			$display("printing contents and state of each valid cache line tag=0x%h, block_offset=0x%h, MESI=%d PLRU=0x%h",cache[index].CACHE_INDEX[i].tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS,cache[index].PLRU);
-			`endif
+			/*$display("Index= 0x%h Tag=0x%h,  MESI=%s PLRU=%b", index, cache[index].CACHE_INDEX[i].tag, cache[index].CACHE_INDEX[block_line].MESI_BITS.name(), cache[index].PLRU);*/
+			
 			end
 		end
 		end else if (opcode ==  8) begin
@@ -219,8 +220,9 @@ function void cache_function();
                                 begin
 					 
                                  result=HIT; //put snoop
+								 $display("SnoopResult: Address %h, SnoopResult: %s", address,result ); 
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result ); 
+                                   
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif				
@@ -233,8 +235,9 @@ function void cache_function();
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = S; 
                                         BusOperation(WRITE);
                                         result=HITM; //put snoop
+										$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif
@@ -244,8 +247,9 @@ function void cache_function();
                                         
                                         cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
                                         result=HIT; //put snoop
+										$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+                                   
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Shared",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif
@@ -262,9 +266,9 @@ function void cache_function();
 					cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
                                    MessageToCache(INVALIDATELINE);
                                    result=HIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result);
 
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result);
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif     
@@ -279,9 +283,9 @@ function void cache_function();
                                         BusOperation(WRITE);
                                         MessageToCache(INVALIDATELINE);
                                         result=HITM; //put snoop
+                                        $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
 
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif
@@ -293,9 +297,9 @@ function void cache_function();
                                         cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
                                    MessageToCache(INVALIDATELINE);
                                    result=HIT; //put snoop
+                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
 
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
                                  `endif
                                 end
@@ -308,8 +312,9 @@ function void cache_function();
 					MessageToCache(INVALIDATELINE);
 				        cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
                                    result=HIT; //put snoop
+								   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
                                  `endif
 		               	end
@@ -381,6 +386,7 @@ function void cache_function();
 		1://wr req from l1 miss
 		begin
 		miss_count=miss_count+1;
+		GetSnoopResult_funct();
 				
 					if (block_line == -1) begin
 						MessageToCache(EVICTLINE);
@@ -445,8 +451,9 @@ function void cache_function();
 		3://snoop rd req miss
 		begin
                                    result=NOHIT; //put snoop
+								   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
                                  `endif	
 		end
@@ -454,8 +461,10 @@ function void cache_function();
 		4://snoop wr req miss
 		begin
                                    result=NOHIT; //put snoop
+	                               $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+							   
+								   
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif
@@ -464,8 +473,9 @@ function void cache_function();
 		5://snoop rd rwim miss
 		begin
                                    result=NOHIT; //put snoop
+								   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif
@@ -473,8 +483,9 @@ function void cache_function();
 		6://snoop rd rwim miss
 		begin
                                    result=NOHIT; //put snoop
+								   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+
                                 `ifdef NORMAL
-                                   $display("SnoopResult: Address %h, SnoopResult: %s", address,result );
                                    $display("Tag and state are as follows tag:%0h , updated_mesi_state:Invalid",cache[index].CACHE_INDEX[block_line].tag);
 
                                  `endif
@@ -550,19 +561,15 @@ function void GetSnoopResult_funct();
 endfunction
 
 function void BusOperation(busOp BusOP);
-`ifdef NORMAL
+
  $display("BusOp: %0s, Address: %0h, Snoop Result: %0s",BusOP,address,result);
 
- 
-`endif
 endfunction
 
 function void MessageToCache(message Message);
-`ifdef NORMAL
+
 $display("L2: %s %h\n", Message, address);
 
-
-`endif
 endfunction
 
 function void reset();
