@@ -1,56 +1,12 @@
-working commands
-vlog Packages.sv 
-vlog -sv CACHE_NEW_2.sv
+////////////////////SILENT MODE COMMANDS//////////////////////////////////////////////////
+vlog Package_1.sv 
+vlog -sv CACHE_NEW_3.sv
+vsim -c +trace_file=sample_trace.din cache_simulator -do "run -all"
+
+////////////////////NORMAL MODE COMMANDS/////////////////////////////////////////////////
+vlog Packages_1.sv 
 vlog -sv +define+NORMAL CACHE_NEW_2.sv 
 vsim -c +trace_file=sample_trace.din cache_simulator -do "run -all"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//passing file through cmds
-vlog -sv +define+DEBUG CACHE_NEW2.sv
-
-
-vlog -sv CACHE_NEW2.sv
-vsim -c +input_file=rwims.din cache_simulator -do "run -all"
-
-
-
-
-
-
-
-
-
-
-
- 
-vsim -c +input_file=rwims.din -do "run -all" work.trace_reader  +define+DEBUG
-//Default file
-vsim -c -do "run -all" work.trace_reader
-///////////////////////////////////////////////////////////////////////////////////////
-vlog -work work /u/rbharadw/MSD_Project/work/MSD_Branch/Cache.sv
-vsim work.cache_simulator -do "run -all; quit;"
