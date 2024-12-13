@@ -1,4 +1,4 @@
-`include "Packages.sv"  // Include the cache parameters package
+`include "Package_1.sv"  // Include the cache parameters package
 import cache_config_pkg::*;
 
 module cache_simulator;
@@ -11,7 +11,7 @@ module cache_simulator;
    string line;
    integer status;
 //Cache simulator variables
-cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache set
+   cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache set
    integer opcode='b0;
    logic [31:0] address='b0;
    logic [TAG_BITS-1:0] tag;
@@ -24,571 +24,567 @@ cache_set_t cache [NUM_SETS-1:0];  // declaring array of 16,384 cache set
    integer hit=0;
    real hit_count='b0;
    real hit_ratio='b0;
-Snoopresult result;
+   Snoopresult result;
 
-initial begin
+initial 
+begin
+       if (!$value$plusargs("trace_file=%s", input_file)) begin  // No input file,use default 
+          input_file = default_file;
+       end
 
-if (!$value$plusargs("trace_file=%s", input_file)) begin  // No input file,use default 
-input_file = default_file;
-end
-
-file = $fopen(input_file, "r");
-if (file == 0) begin
+		file = $fopen(input_file, "r");
+		
+		if (file == 0) begin
 		`ifdef DEBUG
-$display("Error: Could not open the trace file '%s'.", input_file);
+			$display("Error: Could not open the trace file '%s'.", input_file);
             $finish;
          `endif
 		 $finish;
-end 
-else begin
+		end 
+
+		else begin
 		`ifdef DEBUG
-$display("Successfully opened the trace file '%s'.", input_file);
+			$display("Successfully opened the trace file '%s'.", input_file);
 		`endif
-end
+		end
 
-while (!$feof(file)) begin // Read the file line by line 
-line = "";
-if ($fgets(line, file)) begin
-status = $sscanf(line, "%d %h", opcode, address); //$sscanf returns the number of successful conversions
-cache_function();
-`ifdef DEBUG
-$display("addr %h ,op %d",address,opcode);
-`endif
-end
-end
+		while (!$feof(file)) begin // Read the file line by line 
+		line = "";
 
-if (status == 2) begin // Successfully parsed the line
+		if ($fgets(line, file)) begin
+		status = $sscanf(line, "%d %h", opcode, address); //$sscanf returns the number of successful conversions
+		cache_function();
+
 		`ifdef DEBUG
-$display("Sucessfully parsed");
+			$display("addr %h ,op %d",address,opcode);
 		`endif
-end
+		end
+		end
 
-$display("Cache hit ratio = %0f",hit_ratio);
-$display("Number of cache reads= %0d",read_count);
-$display("Number of cache writes = %0d",write_count);
+		if (status == 2) begin // Successfully parsed the line
+		`ifdef DEBUG
+		$display("Sucessfully parsed");
+		`endif
+		end
+
+		$display("Cache hit ratio = %0f",hit_ratio);
+		$display("Number of cache reads= %0d",read_count);
+		$display("Number of cache writes = %0d",write_count);
 		$display("Number of cache hits %0f",hit_count);
 		$display("Number of cache misss %0f",miss_count);
-		$display("Number of cache hits %0d",hit_count);
-		$display("Number of cache miss %0d",miss_count);
 
-$fclose(file);
-$display("Finished reading the file.");
+
+		$fclose(file);
+		$display("Finished reading the file.");
 end
 
 
-function void cache_function();
-hit=0;
-block_offset = address[BLOCK_OFFSET_BITS-1:0];  // Least significant 6 bits
-index = address[BLOCK_OFFSET_BITS + INDEX_BITS-1:BLOCK_OFFSET_BITS];  //index 14 bits
-tag = address[31:BLOCK_OFFSET_BITS + INDEX_BITS];  //tag 12 bits
-
-
-foreach (cache[index].CACHE_INDEX[i]) begin
-if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
-if(cache[index].CACHE_INDEX[i].tag == tag) begin
-hit = 1; 
-block_line = i;
-break;
-end
-end
-end
-
-if (opcode == 9) begin
-/*foreach (cache[index].CACHE_INDEX[i]) begin
-if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
-	
-			//$display("index=0x%h , line=0x%h ,tag=0x%h, block_offset=0x%h, MESI=%s PLRU=0x%b",index,i,cache[index].CACHE_INDEX[i].tag,block_offset,cache[index].CACHE_INDEX[i].MESI_BITS.name(),cache[index].PLRU);
-
-//end
-
-end*/
-cache_contents();
-
-end 
-
-else if (opcode ==  8) begin
-reset();
-end else
-if (hit) begin 
-
-case(opcode)
-
-
-0://rd req from l1 hit
-begin
-hit_count=hit_count+1;
-
-if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
-begin
-
-MessageToCache(SENDLINE);
-updatePLRU(block_line);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-
-end
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
-begin
-MessageToCache(SENDLINE);
-updatePLRU(block_line);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-end
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
-begin
-MessageToCache(SENDLINE);
-updatePLRU(block_line);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-end
-read_count = read_count+1;
-end
-
-1://wr req from l1 hit       
-begin
-hit_count=hit_count+1;
-if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
-begin
-
-MessageToCache(GETLINE);
-cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
-updatePLRU(block_line);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-BusOperation(INVALIDATE);
-end
-
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
-begin
-updatePLRU(block_line);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-end
-
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
-begin
-MessageToCache(GETLINE);
-cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
-updatePLRU(block_line);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-end
-write_count = write_count+1;
-end 
-
-2://rd req instr from l1 hit
-begin
-hit_count=hit_count+1;
-if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
-begin
-MessageToCache(SENDLINE); 
-updatePLRU(block_line);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-end
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
-begin
-MessageToCache(SENDLINE);
-updatePLRU(block_line); 
-
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-
-end
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
-begin
-MessageToCache(SENDLINE);
-updatePLRU(block_line);
-
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-
-end
-read_count = read_count+1;
-end
-
-3://snoop rd req hit
-begin
-if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
-begin
-
-result=HIT; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result ); 
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-			
-end
-
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
-begin
-
-MessageToCache(GETLINE);
-cache[index].CACHE_INDEX[block_line].MESI_BITS = S; 
-BusOperation(WRITE);
-result=HITM; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-end
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
-begin
-
-cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
-result=HIT; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-
-
-end
-end
-
-
-5://snoop rd rwim hit
-begin
-if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
-begin
-
-cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
-MessageToCache(INVALIDATELINE);
-result=HIT; //put snoop
-
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result);
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-  
-
-end
-
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
-begin
-
-MessageToCache(GETLINE);	
-cache[index].CACHE_INDEX[block_line].MESI_BITS = I; 
-BusOperation(WRITE);
-MessageToCache(INVALIDATELINE);
-result=HITM; //put snoop
-
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-
-end
-
-else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
-begin
-
-cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
-MessageToCache(INVALIDATELINE);
-result=HIT; //put snoop
-
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-end
-end 
-
-6://snoop invalidate hit
-begin
-if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) 
-begin
-MessageToCache(INVALIDATELINE);
-cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
-result=HIT; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-end
-end
-
-endcase
-end
-
-else 
-begin
-block_line = -1;
-
-foreach (cache[index].CACHE_INDEX[i]) 
-begin
-
-if (cache[index].CACHE_INDEX[i].MESI_BITS == I) 
-begin
-
-block_line=i;
-break;
-
-end
-end
-
-
-
-case(opcode)
-0://rd req from l1 miss
-begin
-miss_count=miss_count+1;
-GetSnoopResult_funct();
-
-if(result==NOHIT) begin
-if (block_line == -1) begin
-MessageToCache(EVICTLINE);
-block_line=victim_way();
-end
-MessageToCache(SENDLINE);	
-cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
-cache[index].CACHE_INDEX[block_line].tag=tag;
-updatePLRU(block_line);
-
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-BusOperation(READ);
-read_count = read_count+1; 
-end
-
-
-else begin
-if (block_line == -1) begin
-MessageToCache(EVICTLINE);
-block_line=victim_way();
-end
-MessageToCache(SENDLINE);
-cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
-cache[index].CACHE_INDEX[block_line].tag=tag;
-updatePLRU(block_line);
-
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-BusOperation(READ);
-read_count = read_count+1; 
-
-end
-end
-
-1://wr req from l1 miss
-begin
-miss_count=miss_count+1;
-GetSnoopResult_funct();
-if (block_line == -1) begin
-MessageToCache(EVICTLINE);
-block_line=victim_way();
-end
-MessageToCache(SENDLINE);
-cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
-cache[index].CACHE_INDEX[block_line].tag=tag;
-updatePLRU(block_line);
-
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-BusOperation(RWIM);
-write_count = write_count+1;
-
-
-end 
-
-2://rd req instr miss
-begin
-miss_count=miss_count+1;
-GetSnoopResult_funct();
-
-if(result==NOHIT) begin
-if (block_line == -1) begin
-MessageToCache(EVICTLINE);
-block_line=victim_way();
-end
-MessageToCache(SENDLINE);	
-cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
-cache[index].CACHE_INDEX[block_line].tag=tag;
-updatePLRU(block_line);
-
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-BusOperation(READ);
-read_count = read_count+1; 
-end
-
-
-else begin
-if (block_line == -1) begin
-MessageToCache(EVICTLINE);
-block_line=victim_way();
-end
-MessageToCache(SENDLINE);
-cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
-cache[index].CACHE_INDEX[block_line].tag=tag;
-updatePLRU(block_line);
-
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
-
-
-BusOperation(READ);
-read_count = read_count+1;				
-
-end
-
-end
-
-3://snoop rd req miss
-begin
-result=NOHIT; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-end
-
-4://snoop wr req miss
-begin
-result=NOHIT; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-
-end
-
-5://snoop rd rwim miss
-begin
-result=NOHIT; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-
-end  
-6://snoop rd rwim miss
-begin
-result=NOHIT; //put snoop
-
-$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
-$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
-
-
-end  
-
-endcase
-end
-
-hit_ratio= hit_count/(hit_count+miss_count);
-
-endfunction
-
-function automatic void updatePLRU(logic signed [4:0] j);
-int plru_index = 0;
-
-bit [3:0] BL = j;
-BL [0] = block_line[3];
-BL [1] = block_line[2];
-BL [2] = block_line[1];
-BL [3] = block_line[0];
-
-for (int i = 3; i >=0; i--) begin
-if (BL[i]== 1'b0)begin
-cache[index].PLRU[plru_index]=BL[i];
-	`ifdef NORMAL
-	$display("update PLRU[%d]=%d \n",plru_index,BL[i]);
-	`endif
-plru_index = (2 * plru_index) + 1;
-end
-
-else begin
-cache[index].PLRU[plru_index]=BL[i];
-	`ifdef NORMAL
-		$display("update PLRU[%d]=%d \n",plru_index,BL[i]);
-	`endif
-plru_index=(2*plru_index)+2;  
-end
-end
-endfunction
-
-function logic signed [4:0] victim_way();
-   int plru_index;
-   bit [3:0]victim;
-plru_index = 0;
-
-for (int i = 3; i >=0; i--) begin
-if (cache[index].PLRU[plru_index] == 0) //when access way is left victim way is right so we update inverted values
-begin
-//cache[index].PLRU[plru_index] = 1;
-victim[i]=1;
-        plru_index = 2 * plru_index + 2;        
-        plru_index = 2 * plru_index + 2;   		
-end 
-else ////when access way is right victim way is left so we update inverted values
-begin
-//cache[index].PLRU[plru_index] = 0; 
-victim[i]=0;
-plru_index = (2 * plru_index) + 1;        
-end
-end
-	`ifdef NORMAL
-	$display ("victim_way is %d",victim);
-	`endif
-return victim;
-endfunction
-
-function void GetSnoopResult_funct();
-if (address[1:0] == 2'b00)
-result = HIT;
-else if (address[1:0] == 2'b01)
-result = HITM;
-else
-result = NOHIT;
-endfunction
-
-function void BusOperation(busOp BusOP);
-
-$display("BusOp: %0s, Address: %0h, Snoop Result: %0s \n",BusOP,address,result);
-
-
-
-endfunction
-
-function void MessageToCache(message Message);
-
-$display("L2: %s %h", Message, address);
-
-endfunction
-
-function void reset();
-
-read_count='b0;
-write_count='b0;
-miss_count='b0;
-hit=0;
-hit_count='b0;
-
-
-
-for (int j=0;j<NUM_SETS;j++) begin
-for(int i=0;i<16;i++)begin
-cache[j].CACHE_INDEX[i].tag=0;
-cache[j].CACHE_INDEX[i].MESI_BITS=I;
-cache[j].PLRU=0;
-end
-end
-
-endfunction
-
-  	function void cache_contents();
-    		int i, j;	
-    		for (i = 0; i < 16384 ; i++) begin
-      		  for (j = 0; j < 16; j++) begin
-        	   if(!(cache[i].CACHE_INDEX[j].MESI_BITS == I))	
-		   $display("index=0x%h , way=0x%h ,tag=0x%h, MESI=%s PLRU=0x%b",i,j,cache[i].CACHE_INDEX[j].tag,cache[i].CACHE_INDEX[j].MESI_BITS.name(),cache[i].PLRU);
-     		end
-   		 end
-  	endfunction
-
-
+		function void cache_function();
+			hit=0;
+			block_offset = address[BLOCK_OFFSET_BITS-1:0];  // Least significant 6 bits
+			index = address[BLOCK_OFFSET_BITS + INDEX_BITS-1:BLOCK_OFFSET_BITS];  //index 14 bits
+			tag = address[31:BLOCK_OFFSET_BITS + INDEX_BITS];  //tag 12 bits
+
+
+			foreach (cache[index].CACHE_INDEX[i]) begin
+			if (cache[index].CACHE_INDEX[i].MESI_BITS != I) begin
+			if(cache[index].CACHE_INDEX[i].tag == tag) begin
+			hit = 1; 
+			block_line = i;
+			break;
+			end
+			end
+			end
+
+		if (opcode == 9) begin
+
+			cache_contents();
+
+		end 
+
+		else if (opcode ==  8) begin
+			reset();
+		end else
+
+		if (hit) begin 
+
+			case(opcode)
+
+
+		0://rd req from l1 hit
+		begin
+		hit_count=hit_count+1;
+		
+		if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+		begin
+		
+		MessageToCache(SENDLINE);
+		updatePLRU(block_line);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+
+
+
+		end
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+		begin
+		MessageToCache(SENDLINE);
+		updatePLRU(block_line);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		
+		end
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+		begin
+		MessageToCache(SENDLINE);
+		updatePLRU(block_line);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		
+		end
+		read_count = read_count+1;
+		end
+		
+		1://wr req from l1 hit       
+		begin
+		hit_count=hit_count+1;
+		if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+		begin
+		
+		MessageToCache(GETLINE);
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
+		updatePLRU(block_line);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		BusOperation(INVALIDATE);
+		end
+		
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+		begin
+		updatePLRU(block_line);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		end
+		
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+		begin
+		MessageToCache(GETLINE);
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
+		updatePLRU(block_line);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		end
+		write_count = write_count+1;
+		end 
+		
+		2://rd req instr from l1 hit
+		begin
+		hit_count=hit_count+1;
+		if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+		begin
+		MessageToCache(SENDLINE); 
+		updatePLRU(block_line);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		end
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+		begin
+		MessageToCache(SENDLINE);
+		updatePLRU(block_line); 
+		
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		
+		
+		end
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+		begin
+		MessageToCache(SENDLINE);
+		updatePLRU(block_line);
+		
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		
+		
+		end
+		read_count = read_count+1;
+		end
+		
+		3://snoop rd req hit
+		begin
+		if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+		begin
+		
+		result=HIT; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result ); 
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+					
+		end
+		
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+		begin
+		
+		MessageToCache(GETLINE);
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = S; 
+		BusOperation(WRITE);
+		result=HITM; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		end
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+		begin
+		
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
+		result=HIT; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		
+		
+		end
+		end
+		
+		
+		5://snoop rd rwim hit
+		begin
+		if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S)
+		begin
+		
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
+		MessageToCache(INVALIDATELINE);
+		result=HIT; //put snoop
+		
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result);
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		
+		
+		end
+		
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == M)
+		begin
+		
+		MessageToCache(GETLINE);	
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = I; 
+		BusOperation(WRITE);
+		MessageToCache(INVALIDATELINE);
+		result=HITM; //put snoop
+		
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		
+		end
+		
+		else if (cache[index].CACHE_INDEX[block_line].MESI_BITS == E)
+		begin
+		
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
+		MessageToCache(INVALIDATELINE);
+		result=HIT; //put snoop
+		
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		end
+		end 
+		
+		6://snoop invalidate hit
+		begin
+		if (cache[index].CACHE_INDEX[block_line].MESI_BITS == S) 
+		begin
+		MessageToCache(INVALIDATELINE);
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = I;
+		result=HIT; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		end
+		end
+		
+		endcase
+		end
+		
+		else 
+		begin
+		block_line = -1;
+		
+		foreach (cache[index].CACHE_INDEX[i]) 
+		begin
+		
+		if (cache[index].CACHE_INDEX[i].MESI_BITS == I) 
+		begin
+		
+		block_line=i;
+		break;
+		
+		end
+		end
+		
+		
+		
+		case(opcode)
+		0://rd req from l1 miss
+		begin
+		miss_count=miss_count+1;
+		GetSnoopResult_funct();
+		
+		if(result==NOHIT) begin
+		if (block_line == -1) begin
+		MessageToCache(EVICTLINE);
+		block_line=victim_way();
+		end
+		MessageToCache(SENDLINE);	
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
+		cache[index].CACHE_INDEX[block_line].tag=tag;
+		updatePLRU(block_line);
+		
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		
+		BusOperation(READ);
+		read_count = read_count+1; 
+		end
+		
+		
+		else begin
+		if (block_line == -1) begin
+		MessageToCache(EVICTLINE);
+		block_line=victim_way();
+		end
+		MessageToCache(SENDLINE);
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
+		cache[index].CACHE_INDEX[block_line].tag=tag;
+		updatePLRU(block_line);
+		
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		BusOperation(READ);
+		read_count = read_count+1; 
+		
+		end
+		end
+		
+		1://wr req from l1 miss
+		begin
+		miss_count=miss_count+1;
+		GetSnoopResult_funct();
+		if (block_line == -1) begin
+		MessageToCache(EVICTLINE);
+		block_line=victim_way();
+		end
+		MessageToCache(SENDLINE);
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = M;
+		cache[index].CACHE_INDEX[block_line].tag=tag;
+		updatePLRU(block_line);
+		
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		BusOperation(RWIM);
+		write_count = write_count+1;
+		
+		
+		end 
+		
+		2://rd req instr miss
+		begin
+		miss_count=miss_count+1;
+		GetSnoopResult_funct();
+		
+		if(result==NOHIT) begin
+		if (block_line == -1) begin
+		MessageToCache(EVICTLINE);
+		block_line=victim_way();
+		end
+		MessageToCache(SENDLINE);	
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = E;
+		cache[index].CACHE_INDEX[block_line].tag=tag;
+		updatePLRU(block_line);
+		
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		
+		BusOperation(READ);
+		read_count = read_count+1; 
+		end
+		
+		
+		else begin
+		if (block_line == -1) begin
+		MessageToCache(EVICTLINE);
+		block_line=victim_way();
+		end
+		MessageToCache(SENDLINE);
+		cache[index].CACHE_INDEX[block_line].MESI_BITS = S;
+		cache[index].CACHE_INDEX[block_line].tag=tag;
+		updatePLRU(block_line);
+		
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name()); 
+		
+		
+		BusOperation(READ);
+		read_count = read_count+1;				
+		
+		end
+		
+		end
+		
+		3://snoop rd req miss
+		begin
+		result=NOHIT; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		end
+		
+		4://snoop wr req miss
+		begin
+		result=NOHIT; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		
+		end
+		
+		5://snoop rd rwim miss
+		begin
+		result=NOHIT; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		
+		end  
+		6://snoop rd rwim miss
+		begin
+		result=NOHIT; //put snoop
+		
+		$display("SnoopResult: Address %h, SnoopResult: %s", address,result );
+		$display("tag:%0h , MESI=%s",cache[index].CACHE_INDEX[block_line].tag,cache[index].CACHE_INDEX[block_line].MESI_BITS.name());
+		
+		
+		end  
+		
+		endcase
+		end
+		
+		hit_ratio= hit_count/(hit_count+miss_count);
+		
+		endfunction
+		
+		function automatic void updatePLRU(logic signed [4:0] j);
+		int plru_index = 0;
+		
+		bit [3:0] BL = j;
+		BL [0] = block_line[3];
+		BL [1] = block_line[2];
+		BL [2] = block_line[1];
+		BL [3] = block_line[0];
+		
+		for (int i = 3; i >=0; i--) begin
+		if (BL[i]== 1'b0)begin
+		cache[index].PLRU[plru_index]=BL[i];
+			`ifdef NORMAL
+			$display("update PLRU[%d]=%d \n",plru_index,BL[i]);
+			`endif
+		plru_index = (2 * plru_index) + 1;
+		end
+		
+		else begin
+		cache[index].PLRU[plru_index]=BL[i];
+			`ifdef NORMAL
+				$display("update PLRU[%d]=%d \n",plru_index,BL[i]);
+			`endif
+		plru_index=(2*plru_index)+2;  
+		end
+		end
+		endfunction
+		
+		function logic signed [4:0] victim_way();
+		int plru_index;
+		bit [3:0]victim;
+		plru_index = 0;
+		
+		for (int i = 3; i >=0; i--) begin
+		if (cache[index].PLRU[plru_index] == 0) //when access way is left victim way is right so we update inverted values
+		begin
+		
+		victim[i]=1;
+				plru_index = 2 * plru_index + 2;   		
+		end 
+		else ////when access way is right victim way is left so we update inverted values
+		begin
+		
+		victim[i]=0;
+		plru_index = (2 * plru_index) + 1;        
+		end
+		end
+			`ifdef NORMAL
+			$display ("victim_way is %d",victim);
+			`endif
+		return victim;
+		endfunction
+		
+		function void GetSnoopResult_funct();
+		if (address[1:0] == 2'b00)
+		result = HIT;
+		else if (address[1:0] == 2'b01)
+		result = HITM;
+		else
+		result = NOHIT;
+		endfunction
+		
+		function void BusOperation(busOp BusOP);
+		
+		$display("BusOp: %0s, Address: %0h, Snoop Result: %0s \n",BusOP,address,result);
+		
+		
+		
+		endfunction
+		
+		function void MessageToCache(message Message);
+		
+		$display("L2: %s %h", Message, address);
+		
+		endfunction
+		
+		function void reset();
+		
+		read_count='b0;
+		write_count='b0;
+		miss_count='b0;
+		hit=0;
+		hit_count='b0;
+		
+		
+		
+		for (int j=0;j<NUM_SETS;j++) begin
+		for(int i=0;i<16;i++)begin
+		cache[j].CACHE_INDEX[i].tag=0;
+		cache[j].CACHE_INDEX[i].MESI_BITS=I;
+		cache[j].PLRU=0;
+		end
+		end
+		
+		endfunction
+		
+			function void cache_contents();
+					int i, j;	
+					for (i = 0; i < 16384 ; i++) begin
+					for (j = 0; j < 16; j++) begin
+					if(!(cache[i].CACHE_INDEX[j].MESI_BITS == I))	
+				$display("index=0x%h , way=0x%h ,tag=0x%h, MESI=%s PLRU=0x%b",i,j,cache[i].CACHE_INDEX[j].tag,cache[i].CACHE_INDEX[j].MESI_BITS.name(),cache[i].PLRU);
+					end
+				end
+	    endfunction
+		
+		
 endmodule
